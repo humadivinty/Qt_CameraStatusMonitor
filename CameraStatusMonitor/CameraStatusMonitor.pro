@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     LogModel/glogmodel.cpp \
     EventCheck/BaseEventCheck.cpp \
     EventCheck/StatustCheck.cpp \
-    EventCheck/UnlicensePlateCheck.cpp
+    EventCheck/UnlicensePlateCheck.cpp \
+    AlarmModule/AlarmModule.cpp
 
 HEADERS  += mainwindow.h \
     camstatusmodel.h \
@@ -55,7 +56,8 @@ HEADERS  += mainwindow.h \
     LogModel/glogmodel.h \
     EventCheck/BaseEventCheck.h \
     EventCheck/StatustCheck.h \
-    EventCheck/UnlicensePlateCheck.h
+    EventCheck/UnlicensePlateCheck.h \
+    AlarmModule/AlarmModule.h
 
 FORMS    += mainwindow.ui
 

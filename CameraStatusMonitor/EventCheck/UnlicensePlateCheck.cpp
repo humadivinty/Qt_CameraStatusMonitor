@@ -37,11 +37,12 @@ void UnlicensePlateCheck::slot_StartEvent()
                 continue;
             for(int i = 0; i < iRowCount; i ++)
             {
-                QString qstrText = pDataModel->FindColTextFromRow(i, 2);
-                if(qstrText == QString("DisConnect"))
+                QString qstrText = pDataModel->FindColTextFromRow(i, 3);
+                float fRate = qstrText.toFloat();
+                if(fRate > float(0.0))
                 {
                     QString qstrIp = pDataModel->FindColTextFromRow(i, 1);
-                    qDebug()<<qstrIp<<"is DisConnect";
+                    qDebug()<<qstrIp<<"is  beyong 0, Rate is:"<<qstrText;
                 }
             }
         }

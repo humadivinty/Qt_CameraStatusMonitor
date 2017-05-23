@@ -25,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_pStatusEventCheck = new StatustCheck();
     m_pStatusEventCheck->SetDataModel(m_pTableModel);
     m_pStatusEventCheck->StartEvent();
+
+    m_pUnlicensePlateCheck = new UnlicensePlateCheck();
+    m_pUnlicensePlateCheck->SetDataModel(m_pTableModel);
+    m_pUnlicensePlateCheck->StartEvent();
 }
 
 MainWindow::~MainWindow()
@@ -40,9 +44,15 @@ MainWindow::~MainWindow()
         delete m_pStatusEventCheck;
         m_pStatusEventCheck = NULL;
     }
+    if(m_pUnlicensePlateCheck)
+    {
+        delete m_pUnlicensePlateCheck;
+        m_pUnlicensePlateCheck = NULL;
+    }
     if(m_pTableModel)
     {
         delete m_pTableModel;
         m_pTableModel = NULL;
     }
+
 }

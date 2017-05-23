@@ -5,6 +5,7 @@
 #include"DataModel/CustomTableModel.h"
 #include"Controller/camconnectcontrl.h"
 #include"EventCheck/StatustCheck.h"
+#include"EventCheck/UnlicensePlateCheck.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ public:
     CustomTableModel* m_pTableModel;
     CamConnectContrl* m_pCamController;
     StatustCheck* m_pStatusEventCheck;
+    UnlicensePlateCheck* m_pUnlicensePlateCheck;
 };
 
 #endif // MAINWINDOW_H
