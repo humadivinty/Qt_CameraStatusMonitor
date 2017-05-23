@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include"DataModel/CustomTableModel.h"
 #include"Controller/camconnectcontrl.h"
+#include"EventCheck/StatustCheck.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,7 @@ private:
 public:
     CustomTableModel* m_pTableModel;
     CamConnectContrl* m_pCamController;
+    StatustCheck* m_pStatusEventCheck;
 };
 
 #endif // MAINWINDOW_H

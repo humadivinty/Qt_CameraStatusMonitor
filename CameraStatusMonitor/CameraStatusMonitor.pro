@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     Camera/cameraresult.cpp \
     Controller/camconnectcontrl.cpp \
     LogModel/glogmodel.cpp \
-    EventCheck/BaseEventCheck.cpp
+    EventCheck/BaseEventCheck.cpp \
+    EventCheck/StatustCheck.cpp \
+    EventCheck/UnlicensePlateCheck.cpp
 
 HEADERS  += mainwindow.h \
     camstatusmodel.h \
@@ -51,7 +53,9 @@ HEADERS  += mainwindow.h \
     HvDeviceAPI/SWErrCode.h \
     Controller/camconnectcontrl.h \
     LogModel/glogmodel.h \
-    EventCheck/BaseEventCheck.h
+    EventCheck/BaseEventCheck.h \
+    EventCheck/StatustCheck.h \
+    EventCheck/UnlicensePlateCheck.h
 
 FORMS    += mainwindow.ui
 

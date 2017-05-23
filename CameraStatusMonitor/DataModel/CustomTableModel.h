@@ -19,6 +19,9 @@ public:
     void UpdataTextFromQString(int iRow, int iColumn, const QString strText);
 
     int FindRowFromQString(int iColumn, const QString strText);
+    int GetRowCount();
+    int GetColCount();
+    QString FindColTextFromRow(int iRow, int iColumn);
 };
 
 #endif // CAMSTATUSMODEL

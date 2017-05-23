@@ -1,23 +1,24 @@
-#include "StatustCheck.h"
+#include "UnlicensePlateCheck.h"
 #include<QMutexLocker>
 #include<QDebug>
 #include"LogModel/glogmodel.h"
 
-StatustCheck::StatustCheck(QObject *parent) : BaseEventCheck(parent)
+UnlicensePlateCheck::UnlicensePlateCheck(QObject *parent)
+    : BaseEventCheck(parent)
 {
     m_bExitCheck = false;
     m_pDataModel = NULL;
 }
 
-StatustCheck::~StatustCheck()
+UnlicensePlateCheck::~UnlicensePlateCheck()
 {
     SetDataModel(NULL);
     StopCheck();
 }
 
-void StatustCheck::slot_StartEvent()
+void UnlicensePlateCheck::slot_StartEvent()
 {
-    GLogModel::GetInstant()->WriteLog("StatustCheck","StartEvent begin.");
+    GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck","StartEvent begin.");
 
     bool bRet = false;
     CustomTableModel* pDataModel = NULL;
@@ -47,16 +48,16 @@ void StatustCheck::slot_StartEvent()
         QThread::currentThread()->sleep(1);
     }
 
-    GLogModel::GetInstant()->WriteLog("StatustCheck","StartEvent end.");
+    GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck","StartEvent end.");
 }
 
-void StatustCheck::StopCheck()
+void UnlicensePlateCheck::StopCheck()
 {
     QMutexLocker locker(&m_mutex);
     m_bExitCheck = true;
 }
 
-void StatustCheck::SetDataModel(CustomTableModel *DataModel)
+void UnlicensePlateCheck::SetDataModel(CustomTableModel *DataModel)
 {
     QMutexLocker locker(&m_mutex);
     m_pDataModel = DataModel;

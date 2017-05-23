@@ -1,16 +1,18 @@
-#ifndef STATUSTCHECK_H
-#define STATUSTCHECK_H
-
-#include <QObject>
+#ifndef UNLICENSEPLATECHECK_H
+#define UNLICENSEPLATECHECK_H
 #include<QMutex>
-#include"DataModel/CustomTableModel.h"
-#include"EventCheck/BaseEventCheck.h"
 
-class StatustCheck : public BaseEventCheck
+#include"EventCheck/BaseEventCheck.h"
+#include"DataModel/CustomTableModel.h"
+
+
+
+class UnlicensePlateCheck : public BaseEventCheck
 {
 public:
-    explicit StatustCheck(QObject *parent = 0);
-    ~StatustCheck();
+    explicit UnlicensePlateCheck(QObject *parent = 0);
+
+    ~UnlicensePlateCheck();
 signals:
 
 public slots:
@@ -26,4 +28,4 @@ public:
     void SetDataModel(CustomTableModel* DataModel);
 };
 
-#endif // STATUSTCHECK_H
+#endif // UNLICENSEPLATECHECK_H

@@ -18,8 +18,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_pCamController = new CamConnectContrl();
     m_pCamController->SetDataModel(m_pTableModel);
     //m_pCamController->addCameraByIPaddress("172.18.2.152");
-    m_pCamController->addCameraByIPaddress("172.18.80.166");
+    //m_pCamController->addCameraByIPaddress("172.18.80.166");
+    m_pCamController->addCameraByIPaddress("172.18.80.65");
     m_pCamController->StarUpLoad();
+
+    m_pStatusEventCheck = new StatustCheck();
+    m_pStatusEventCheck->SetDataModel(m_pTableModel);
+    m_pStatusEventCheck->StartEvent();
 }
 
 MainWindow::~MainWindow()
@@ -29,6 +34,11 @@ MainWindow::~MainWindow()
     {
         delete m_pCamController;
         m_pCamController = NULL;
+    }
+    if(m_pStatusEventCheck)
+    {
+        delete m_pStatusEventCheck;
+        m_pStatusEventCheck = NULL;
     }
     if(m_pTableModel)
     {

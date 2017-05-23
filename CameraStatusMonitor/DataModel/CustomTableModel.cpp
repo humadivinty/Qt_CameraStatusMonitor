@@ -117,11 +117,36 @@ int CustomTableModel::FindRowFromQString(int iColumn, const QString strText)
     QString qstrValue ;
     for (int i = 0; i < this->rowCount(); i++)
     {
-        qstrValue = this->item(i, iColumn)->text();
+        //qstrValue = this->item(i, iColumn)->text();
+        qstrValue = this->index(i, iColumn).data().toString();
         if (qstrValue == strText) {
             return i;
         }
     }
 
     return -1;
+}
+
+int CustomTableModel::GetRowCount()
+{
+    return this->rowCount();
+}
+
+int CustomTableModel::GetColCount()
+{
+    return this->columnCount();
+}
+
+QString CustomTableModel::FindColTextFromRow(int iRow, int iColumn)
+{
+    int rowCount = this->rowCount();
+    int columnCount = this->columnCount();
+
+    if(iRow > rowCount || iColumn > columnCount)
+        return QString("");
+
+    QString qstrValue;
+    qstrValue = this->index(iRow, iColumn).data().toString();
+    //qstrValue = this->item(iRow, iColumn)->text();    //这样使用会崩溃
+    return qstrValue;
 }
