@@ -3,7 +3,9 @@
 #include<QDebug>
 #include"LogModel/glogmodel.h"
 
-StatustCheck::StatustCheck(QObject *parent) : BaseEventCheck(parent)
+StatustCheck::StatustCheck(QObject *parent)
+    : BaseEventCheck(parent),
+      m_iCount(5)
 {
     m_bExitCheck = false;
     m_pDataModel = NULL;
@@ -40,11 +42,17 @@ void StatustCheck::slot_StartEvent()
                 if(qstrText == QString("DisConnect"))
                 {
                     QString qstrIp = pDataModel->FindColTextFromRow(i, 1);
-                    qDebug()<<qstrIp<<"is DisConnect";
+                    QString qstrLog = QString("%1 is disconnect").arg(qstrIp);
+                    AlarmMessage alarMsg;
+                    alarMsg.iType = ALARM_EVENT_DISCONNECT;
+                    alarMsg.qstrContent = qstrLog;
+
+                    GLogModel::GetInstant()->WriteLog("StatustCheck", qstrLog);
+                    emit signal_SendAlarm(alarMsg);
                 }
             }
         }
-        QThread::currentThread()->sleep(1);
+        QThread::currentThread()->sleep(10);
     }
 
     GLogModel::GetInstant()->WriteLog("StatustCheck","StartEvent end.");
@@ -60,5 +68,20 @@ void StatustCheck::SetDataModel(CustomTableModel *DataModel)
 {
     QMutexLocker locker(&m_mutex);
     m_pDataModel = DataModel;
+}
+
+void StatustCheck::SetDisConCount(int Count)
+{
+    QString qstrLog;
+    qstrLog = QString("SetDisConCount ,input Count = %1").arg(Count);
+    GLogModel::GetInstant()->WriteLog("StatustCheck",qstrLog);
+
+    if(Count > 0)
+    {
+      m_iCount = Count;
+    }
+
+    qstrLog = QString("SetDisConCount ,final Count = %1").arg(m_iCount);
+    GLogModel::GetInstant()->WriteLog("StatustCheck",qstrLog);
 }
 

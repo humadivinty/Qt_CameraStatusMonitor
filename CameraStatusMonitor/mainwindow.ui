@@ -65,7 +65,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableView" name="StatusTableView"/>
+       <widget class="QTableView" name="StatusTableView">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>200</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">
@@ -88,10 +95,16 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>80</height>
+           </size>
           </property>
           <property name="text">
            <string>TextLabel</string>
@@ -115,7 +128,20 @@
          </spacer>
         </item>
         <item>
-         <widget class="QListView" name="LogListView"/>
+         <widget class="QListWidget" name="listWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>80</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

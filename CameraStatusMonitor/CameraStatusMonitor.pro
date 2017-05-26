@@ -66,3 +66,5 @@ LIBS += -L$$PWD/HvDeviceAPI -lHvDevice
 
 INCLUDEPATH += $$PWD/HvDeviceAPI
 DEPENDPATH += $$PWD/HvDeviceAPI
+
+RESOURCES +=
