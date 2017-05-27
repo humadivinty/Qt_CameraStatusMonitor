@@ -7,6 +7,34 @@ CustomTableModel::CustomTableModel(QObject *parent)
 
 }
 
+QVariant CustomTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(role == Qt::DisplayRole)
+    {
+        if(orientation == Qt::Horizontal)
+        {
+            switch (section)
+            {
+//            case 0:
+//                return QString::fromLocal8Bit("设备名称");
+//                break;
+            case 0:
+                return QString::fromLocal8Bit("设备IP");
+                break;
+            case 1:
+                return QString::fromLocal8Bit("设备连接状态");
+                break;
+            case 2:
+                return QString::fromLocal8Bit("无车牌比率");
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    return QVariant();
+}
+
 
 //QVariant CustomTableModel::data(const QModelIndex &index, int role) const
 //{
@@ -109,6 +137,7 @@ void CustomTableModel::UpdataTextFromQString(int iRow, int iColumn, const QStrin
     this->item(iRow, iColumn)->setText(strText);
 }
 
+//查找列值符合的对应行
 int CustomTableModel::FindRowFromQString(int iColumn, const QString strText)
 {
     if (iColumn < 0) {
@@ -137,6 +166,7 @@ int CustomTableModel::GetColCount()
     return this->columnCount();
 }
 
+//查找指定行列的值
 QString CustomTableModel::FindColTextFromRow(int iRow, int iColumn)
 {
     int rowCount = this->rowCount();

@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->pushButton->setVisible(false);
+
     QPixmap pixmap("./greenLight.png");
     ui->label->setPixmap(pixmap);
     ui->label->show();
@@ -52,14 +54,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    AlarmMessage MyMessage;
-    MyMessage.iType =1;
-    MyMessage.qstrContent = QString("success!");
-    emit signal_SendAlarm(MyMessage);
+//    AlarmMessage MyMessage;
+//    MyMessage.iType =1;
+//    MyMessage.qstrContent = QString("success!");
+//    emit signal_SendAlarm(MyMessage);
+    QModelIndex index = this->ui->StatusTableView->currentIndex();
+    QStringList tempList = index.data().toStringList();
+    qDebug()<<tempList;
+
 }
 
 void MainWindow::slot_Receive_AlarmMsessage(AlarmMessage Msg)
 {
+    qDebug()<<"Receive Message";
+
     static int iTimes = 0;
    QPixmap pixmap;
     if(iTimes++ > 100)
@@ -77,7 +85,7 @@ void MainWindow::slot_Receive_AlarmMsessage(AlarmMessage Msg)
         ui->label->setPixmap(pixmap);
         break;
 
-    case ALARM_EVENT_DISCONNECT:
+    case ALARM_EVENT_DISCONNECT_TIMEOUT:
         pixmap.load("./RetLight.png");
         ui->label->setPixmap(pixmap);
         break;
@@ -90,8 +98,6 @@ void MainWindow::slot_Receive_AlarmMsessage(AlarmMessage Msg)
     default:
         break;
     }
-
-    qDebug()<<"Receive Message";
 }
 
 void MainWindow::ReadConfig()
@@ -101,7 +107,33 @@ void MainWindow::ReadConfig()
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
 
     m_iUnLicenseRate = App_cfg.value("ApplicationInfo/UnLicenseRate", 30).toInt();
+    App_cfg.setValue("ApplicationInfo/UnLicenseRate", m_iUnLicenseRate);
+
     m_iDisconnectCount = App_cfg.value("ApplicationInfo/DisconnectCount",5 ).toInt();
+    App_cfg.setValue("ApplicationInfo/DisconnectCount",m_iDisconnectCount );
+
+    m_iCheckTimeRange = App_cfg.value("ApplicationInfo/CheckTimeRange",10 ).toInt();
+    App_cfg.setValue("ApplicationInfo/CheckTimeRange",m_iCheckTimeRange );
+
+    m_iDurationTime = App_cfg.value("ApplicationInfo/DurationTime",5 ).toInt();
+    App_cfg.setValue("ApplicationInfo/DurationTime",m_iDurationTime );
+
+    m_iCameraCount = App_cfg.value("ApplicationInfo/CameraCount",1 ).toInt();
+    App_cfg.setValue("ApplicationInfo/CameraCount", m_iCameraCount);
+
+
+    QString qstrCamIp, qstrStationID;
+    for(int i= 0; i< m_iCameraCount; i++)
+    {
+        CameraInfo tempInfo;
+        qstrCamIp = App_cfg.value(QString("Camera%1/IpAddress").arg(i+1), "127.0.0.1").toString();
+        App_cfg.setValue(QString("Camera%1/IpAddress").arg(i+1), qstrCamIp);
+
+        qstrStationID = App_cfg.value(QString("Camera%1/StationInfo").arg(i+1), "").toString();
+        strcpy(tempInfo.chIP, qstrCamIp.toStdString().c_str());
+        strcpy(tempInfo.chStationID, qstrStationID.toStdString().c_str());
+        m_CamInfoList.append(tempInfo);
+    }
 }
 
 void MainWindow::InitEventCheckModel()
@@ -114,7 +146,8 @@ void MainWindow::InitEventCheckModel()
         connect(m_pStatusEventCheck,  &(m_pStatusEventCheck->signal_SendAlarm), m_pAlarmModel, &(m_pAlarmModel->slot_Receive_AlarmMsessage));
 
         m_pStatusEventCheck->SetDataModel(m_pTableModel);
-        m_pStatusEventCheck->SetDisConCount(m_iDisconnectCount);
+        m_pStatusEventCheck->SetDisConTimeRangeAndCount(m_iCheckTimeRange, m_iDisconnectCount);
+        m_pStatusEventCheck->SetCheckDisconnectTimeOut(m_iDurationTime);
         m_pStatusEventCheck->StartEvent();
     }
 
@@ -152,9 +185,12 @@ void MainWindow::InitConnectModel()
 
         m_pCamController = new CamConnectContrl();
         m_pCamController->SetDataModel(m_pTableModel);
-        //m_pCamController->addCameraByIPaddress("172.18.2.152");
         //m_pCamController->addCameraByIPaddress("172.18.80.166");
-        m_pCamController->addCameraByIPaddress("172.18.80.65");
+        for(int i= 0; i< m_CamInfoList.count(); i++)
+        {
+            m_pCamController->addCameraByIPaddress(m_CamInfoList[i].chIP, m_CamInfoList[i].chStationID);
+        }
+        //m_pCamController->addCameraByIPaddress("172.18.80.65", "第一个");
         m_pCamController->StarUpLoad();
     }
 }
@@ -209,7 +245,7 @@ void MainWindow::UnInitConnectModel()
 void MainWindow::on_pushButton_2_clicked()
 {
     AlarmMessage MyMessage;
-    MyMessage.iType =0;
-    MyMessage.qstrContent = QString("success!");
+    MyMessage.iType =ALARM_EVENT_NORMAL;
+    MyMessage.qstrContent = QString::fromLocal8Bit("解除当前警报");
     emit signal_SendAlarm(MyMessage);
 }

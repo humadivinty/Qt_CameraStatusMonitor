@@ -2,6 +2,7 @@
 #include<QMutexLocker>
 #include<QDebug>
 #include"LogModel/glogmodel.h"
+#include"data_commomdef.h"
 
 UnlicensePlateCheck::UnlicensePlateCheck(QObject *parent)
     : BaseEventCheck(parent),
@@ -40,11 +41,13 @@ void UnlicensePlateCheck::slot_StartEvent()
                 continue;
             for(int i = 0; i < iRowCount; i ++)
             {
-                QString qstrText = pDataModel->FindColTextFromRow(i, 3);
+                //QString qstrText = pDataModel->FindColTextFromRow(i, 3);
+                QString qstrText = pDataModel->FindColTextFromRow(i, RATE_COLUMN_NUMBER);
                 float fRate = qstrText.toFloat();
                 if(fRate > fUnlicenseRate)
                 {
-                    QString qstrIp = pDataModel->FindColTextFromRow(i, 1);
+                    //QString qstrIp = pDataModel->FindColTextFromRow(i, 1);
+                    QString qstrIp = pDataModel->FindColTextFromRow(i, IPADDRESS_COLUMN_NUMBER);
                     QString qstrLog = QString("%1 `s Rate is %2  over range of the Unlicense rate %2").arg(qstrIp).arg(QString::number(fRate, 'f', 2)).arg(QString::number(fUnlicenseRate, 'f', 2));
                     AlarmMessage alarMsg;
                     alarMsg.iType = ALARM_EVENT_UNLICENSE;

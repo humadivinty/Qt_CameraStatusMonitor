@@ -22,8 +22,14 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    int m_iUnLicenseRate;
-    int m_iDisconnectCount;
+    int m_iUnLicenseRate;          //无车牌所占比率
+    int m_iCheckTimeRange;      //监测断开次数的时间段
+    int m_iDisconnectCount;     //断开次数
+
+    int m_iDurationTime;        //断开状态持续时间
+
+    int m_iCameraCount;          //相机数
+    QList<CameraInfo> m_CamInfoList;
 public:
     CustomTableModel* m_pTableModel;
     CamConnectContrl* m_pCamController;

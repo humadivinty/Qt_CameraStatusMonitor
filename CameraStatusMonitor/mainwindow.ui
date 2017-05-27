@@ -37,6 +37,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QPushButton" name="pushButton">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -57,7 +60,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>移除选中设备</string>
+            <string>解除当前警报</string>
            </property>
           </widget>
          </item>

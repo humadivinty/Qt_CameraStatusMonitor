@@ -1,6 +1,7 @@
 #include "camconnectcontrl.h"
 #include"LogModel/glogmodel.h"
 #include<QDebug>
+#include"data_commomdef.h"
 
 CamConnectContrl::CamConnectContrl(QObject *parent)
     : QObject(parent),
@@ -33,7 +34,7 @@ CamConnectContrl::~CamConnectContrl()
      GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] ~CamConnectContrl .").arg(quintptr(QThread::currentThreadId())));
 }
 
-bool CamConnectContrl::addCameraByIPaddress(QString ipaddress)
+bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraName)
 {
     if(ipaddress.isEmpty())
     {
@@ -58,6 +59,14 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress)
         Camera6467* pNewCamera = new Camera6467(ipaddress.toStdString().c_str());
         if(pNewCamera)
         {
+            if(!CameraName.isEmpty())
+            {
+                CameraInfo tempInfo;
+                sprintf(tempInfo.chIP,"%s", ipaddress.toStdString().c_str());
+                sprintf(tempInfo.chStationID,"%s", CameraName.toStdString().c_str());
+                pNewCamera->SetCameraInfo(tempInfo);
+            }
+
             m_pCamList.push_back(pNewCamera);
             pNewCamera = NULL;
 
@@ -156,18 +165,19 @@ void CamConnectContrl::PushDataToModel(CameraInfo &info)
      if(m_pDataModel)
      {
          //目前定义列表为 StationID - IP - ConnectInfo - UnlicensedPlateRatio
-         QString qstrStationID = QString(info.chStationID);
+         //QString qstrStationID = QString(info.chStationID);
          QString qstrIP = QString(info.chIP);
          QString qstrConnectInfo = (info.iConnectStatus == 0 ? QString("Connect") : QString("DisConnect"));
          QString qstrfUnlicensedPlateRatio = QString::number(info.fUnlicensedPlateRatio, 'f', 2);
 
          QStringList CamInfoList;
-         CamInfoList.append(qstrStationID);
+         //CamInfoList.append(qstrStationID);
          CamInfoList.append(qstrIP);
          CamInfoList.append(qstrConnectInfo);
          CamInfoList.append(qstrfUnlicensedPlateRatio);
 
-         int index = m_pDataModel->FindRowFromQString(1, qstrIP);
+         //int index = m_pDataModel->FindRowFromQString(1, qstrIP);
+         int index = m_pDataModel->FindRowFromQString(IPADDRESS_COLUMN_NUMBER, qstrIP);
          if(index > -1)
          {
              m_pDataModel->UpdataRowFromQStringList(index, CamInfoList);

@@ -13,7 +13,7 @@ Camera6467::Camera6467()
     : m_CameraResult(NULL),
       m_hHvHandle(NULL),
       m_iConnectStatus(0),
-      m_bLogEnable(false),
+      m_bLogEnable(true),
       m_bSynTime(false),
       m_bResultComplete(false),
       m_bFirstConnect(true),
@@ -33,7 +33,7 @@ Camera6467::Camera6467(const char *chIP)
     : m_CameraResult(NULL),
       m_hHvHandle(NULL),
       m_iConnectStatus(0),
-      m_bLogEnable(false),
+      m_bLogEnable(true),
       m_bSynTime(false),
       m_bResultComplete(false),
       m_bFirstConnect(true),
@@ -631,7 +631,7 @@ CameraInfo &Camera6467::GetCameraInfo()
     strcpy(m_CamInfo.chIP,this->m_strIP.c_str());
     strcpy(m_CamInfo.chDeviceID, this->m_chDeviceID);
     strcpy(m_CamInfo.chLaneID, this->m_chLaneID);
-    strcpy(m_CamInfo.chStationID, this->m_chDeviceID);
+    strcpy(m_CamInfo.chStationID, this->m_chStationID);
     m_CamInfo.iConnectStatus = GetCamStatus();  //Connect :  0 ; DisConnect : 1
 
     return m_CamInfo;
@@ -872,7 +872,7 @@ int Camera6467::RecordInfoPlate(DWORD dwCarID, LPCSTR pcPlateNo, LPCSTR pcAppend
         qDebug()<<plateNo;
         WriteLog(plateNo);
 
-        if(m_iTotalPlateCount <= 5)
+        if(m_iTotalPlateCount <= 100)
         {
             m_iTotalPlateCount++;
             if(plateNo.contains("无"))

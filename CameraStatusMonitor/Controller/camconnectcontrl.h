@@ -16,7 +16,7 @@ public:
     explicit CamConnectContrl(QObject *parent = 0);
     ~CamConnectContrl();
 
-    bool addCameraByIPaddress(QString ipaddress);
+    bool addCameraByIPaddress(QString ipaddress, QString CameraName);
     void RemoveCamerFromIPaddress(QString ipaddress);
     void RemoveAllCamera();
     void SetDataModel(CustomTableModel* DataModel);

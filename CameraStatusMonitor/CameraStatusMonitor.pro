@@ -57,7 +57,8 @@ HEADERS  += mainwindow.h \
     EventCheck/BaseEventCheck.h \
     EventCheck/StatustCheck.h \
     EventCheck/UnlicensePlateCheck.h \
-    AlarmModule/AlarmModule.h
+    AlarmModule/AlarmModule.h \
+    data_commomdef.h
 
 FORMS    += mainwindow.ui
 
@@ -68,3 +69,9 @@ INCLUDEPATH += $$PWD/HvDeviceAPI
 DEPENDPATH += $$PWD/HvDeviceAPI
 
 RESOURCES +=
+
+VERSION = 1.0.0.1
+QMAKE_TARGET_PRODUCT =
+QMAKE_TARGET_COMPANY =
+QMAKE_TARGET_DESCRIPTION =
+QMAKE_TARGET_COPYRIGHT =

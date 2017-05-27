@@ -6,8 +6,8 @@
 #include<QString>
 #include <QMetaType>
 
-#define ALARM_EVENT_NORMAL 0        //连接断开
-#define ALARM_EVENT_DISCONNECT 1        //连接断开
+#define ALARM_EVENT_NORMAL 0        //连接正常
+#define ALARM_EVENT_DISCONNECT_TIMEOUT 1        //连接断开
 #define ALARM_EVENT_UNLICENSE    2           //“无车牌”数量过多
 
 

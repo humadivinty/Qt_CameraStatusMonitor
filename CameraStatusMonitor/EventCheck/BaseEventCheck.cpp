@@ -1,6 +1,7 @@
 #include "BaseEventCheck.h"
 #include"LogModel/glogmodel.h"
 
+
 BaseEventCheck::BaseEventCheck(QObject *parent) : QObject(parent)
 {
     this->moveToThread(&WorkerThread);
