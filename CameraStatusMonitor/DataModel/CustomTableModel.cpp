@@ -16,16 +16,17 @@ QVariant CustomTableModel::headerData(int section, Qt::Orientation orientation, 
             switch (section)
             {
 //            case 0:
-//                return QString::fromLocal8Bit("Éè±¸Ãû³Æ");
+//                return QString::fromLocal8Bit("è®¾å¤‡åç§°");
 //                break;
             case 0:
-                return QString::fromLocal8Bit("Éè±¸IP");
+                //return QString::fromLocal8Bit("è®¾å¤‡IP");
+                return tr("Device IP Address");
                 break;
             case 1:
-                return QString::fromLocal8Bit("Éè±¸Á¬½Ó×´Ì¬");
+                return tr("Device Connect Status");
                 break;
             case 2:
-                return QString::fromLocal8Bit("ÎŞ³µÅÆ±ÈÂÊ");
+                return tr("Rates of Unlicense");
                 break;
             default:
                 break;
@@ -71,12 +72,12 @@ QVariant CustomTableModel::headerData(int section, Qt::Orientation orientation, 
 //    return QVariant();
 //}
 
-//Çå³ıËùÓĞĞĞ
+//æ¸…é™¤æ‰€æœ‰è¡Œ
 void CustomTableModel::removeAll()
 {
     this->removeRows(0, this->rowCount());
 }
-//°´Ö¸¶¨ÁĞÎÄ±¾Çå³ıĞĞ
+//æŒ‰æŒ‡å®šåˆ—æ–‡æœ¬æ¸…é™¤è¡Œ
 void CustomTableModel::removeRowFromQString(int iColumn, const QString strText)
 {
     QList<int> listDelet;
@@ -107,37 +108,43 @@ void CustomTableModel::InsertRowFromQStringList(const QStringList strList)
     QList<QStandardItem*> iTempList;
     for(int i = 0; i < strList.count(); i++)
     {
-        //ÓÉÓÚÎÄµµÖĞËµ ÔÚÕû¸ömodel±»´İ»ÙµÄÊ±ºò£¬ËüµÄitemÏîÒ²»á±»´İ»Ù£¬ËùÒÔÕâÀïnew³öÀ´Ö®ºó²»ÓÃÈË¹¤È¥deleteÊÍ·Å£¿
+        //ç”±äºæ–‡æ¡£ä¸­è¯´ åœ¨æ•´ä¸ªmodelè¢«æ‘§æ¯çš„æ—¶å€™ï¼Œå®ƒçš„itemé¡¹ä¹Ÿä¼šè¢«æ‘§æ¯ï¼Œæ‰€ä»¥è¿™é‡Œnewå‡ºæ¥ä¹‹åä¸ç”¨äººå·¥å»deleteé‡Šæ”¾ï¼Ÿ
         QStandardItem* pItem = new QStandardItem();
         pItem->setTextAlignment(Qt::AlignCenter);
         pItem->setText(strList.at(i));
         iTempList.append(pItem);
     }
+    beginResetModel();
     this->appendRow(iTempList);
+    endResetModel();
 }
 
-// °´ÎÄ±¾ÁĞ±í¸üĞÂÄ³ĞĞ
+// æŒ‰æ–‡æœ¬åˆ—è¡¨æ›´æ–°æŸè¡Œ
 void CustomTableModel::UpdataRowFromQStringList(int iRow, const QStringList strList)
 {
     if(iRow < 0 || strList.isEmpty())
         return;
 
+    beginResetModel();
     for(int i = 0; i < strList.count(); i ++)
     {
         this->item(iRow, i)->setText(strList.at(i));
     }
+    endResetModel();
 }
 
-// °´ÎÄ±¾¸üĞÂÄ³¸ö¸ñµÄÄÚÈİ
+// æŒ‰æ–‡æœ¬æ›´æ–°æŸä¸ªæ ¼çš„å†…å®¹
 void CustomTableModel::UpdataTextFromQString(int iRow, int iColumn, const QString strText)
 {
     if (iRow < 0 || iColumn < 0) {
         return ;
     }
+    beginResetModel();
     this->item(iRow, iColumn)->setText(strText);
+    endResetModel();
 }
 
-//²éÕÒÁĞÖµ·ûºÏµÄ¶ÔÓ¦ĞĞ
+//æŸ¥æ‰¾åˆ—å€¼ç¬¦åˆçš„å¯¹åº”è¡Œ
 int CustomTableModel::FindRowFromQString(int iColumn, const QString strText)
 {
     if (iColumn < 0) {
@@ -166,7 +173,7 @@ int CustomTableModel::GetColCount()
     return this->columnCount();
 }
 
-//²éÕÒÖ¸¶¨ĞĞÁĞµÄÖµ
+//æŸ¥æ‰¾æŒ‡å®šè¡Œåˆ—çš„å€¼
 QString CustomTableModel::FindColTextFromRow(int iRow, int iColumn)
 {
     int rowCount = this->rowCount();
@@ -177,6 +184,6 @@ QString CustomTableModel::FindColTextFromRow(int iRow, int iColumn)
 
     QString qstrValue;
     qstrValue = this->index(iRow, iColumn).data().toString();
-    //qstrValue = this->item(iRow, iColumn)->text();    //ÕâÑùÊ¹ÓÃ»á±ÀÀ£
+    //qstrValue = this->item(iRow, iColumn)->text();    //è¿™æ ·ä½¿ç”¨ä¼šå´©æºƒ
     return qstrValue;
 }

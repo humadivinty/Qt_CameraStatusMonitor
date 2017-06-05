@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = CameraStatusMonitor
 TEMPLATE = app
 
+TRANSLATIONS = CamStatus_zh-cn.ts
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -70,8 +71,4 @@ DEPENDPATH += $$PWD/HvDeviceAPI
 
 RESOURCES +=
 
-VERSION = 1.0.0.1
-QMAKE_TARGET_PRODUCT =
-QMAKE_TARGET_COMPANY =
-QMAKE_TARGET_DESCRIPTION =
-QMAKE_TARGET_COPYRIGHT =
+RC_FILE = CameraStatusMonitor.rc

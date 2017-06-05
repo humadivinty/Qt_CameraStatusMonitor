@@ -217,7 +217,7 @@ void StatustCheck::CheckChangeTimes(CamStatusInfo * Info,QString StatusText, int
     CamStatusInfo * tempInfo = Info;
     int iStatus = -1;
 
-    if(StatusText == QString("DisConnect"))
+    if(StatusText == tr("DisConnect"))
     {
         iStatus = -1;
     }
@@ -271,8 +271,8 @@ void StatustCheck::CheckChangeTimes(CamStatusInfo * Info,QString StatusText, int
     if(tempInfo->iChangeTimes > iChangeTimes)
     {
         qstrLog.clear();
-        //qstrLog = QString("CheckChangeTimes, %1 status change times is over range %2, send alarm message.").arg(tempInfo->qstrCamIP).arg(iChangeTimes);
-        qstrLog = QString::fromLocal8Bit("CheckChangeTimes, %1 在指定时间段内状态变化次数过多，变化次数为%2 次, 发送警报消息.").arg(tempInfo->qstrCamIP).arg(iChangeTimes);
+        qstrLog = tr("CheckChangeTimes, %1 status change times is over range %2, send alarm message.").arg(tempInfo->qstrCamIP).arg(iChangeTimes);
+        //qstrLog = QString::fromLocal8Bit("CheckChangeTimes, %1 在指定时间段内状态变化次数过多，变化次数为%2 次, 发送警报消息.").arg(tempInfo->qstrCamIP).arg(iChangeTimes);
 
         AlarmMessage alarMsg;
         alarMsg.iType = ALARM_EVENT_DISCONNECT_TIMEOUT;
@@ -309,7 +309,7 @@ void StatustCheck::CheckDisConnectTimeOut(CamStatusInfo *Info, QString StatusTex
         iTimeOut = timeOut * MS_OF_ONE_MIMINUTE;
     }
 
-    if(StatusText == QString("DisConnect"))
+    if(StatusText == tr("DisConnect"))
     {
         if(tempInfo->iLastNormalTick == 0)
         {
@@ -329,8 +329,8 @@ void StatustCheck::CheckDisConnectTimeOut(CamStatusInfo *Info, QString StatusTex
 
                 //如果不正常的状态超过指定时间，则发出警报信号
                 qstrLog.clear();
-                //qstrLog = QString("CheckDisConnectTimeOut, %1 is disconnect and over range the timeout %2 minutes").arg(tempInfo->qstrCamIP).arg(timeOut);
-                qstrLog = QString::fromLocal8Bit("CheckDisConnectTimeOut, %1 断开状态持续时间超过 %2 分钟").arg(tempInfo->qstrCamIP).arg(timeOut);
+                qstrLog = tr("CheckDisConnectTimeOut, %1 is disconnect and over range the timeout %2 minutes").arg(tempInfo->qstrCamIP).arg(timeOut);
+                //qstrLog = QString::fromLocal8Bit("CheckDisConnectTimeOut, %1 断开状态持续时间超过 %2 分钟").arg(tempInfo->qstrCamIP).arg(timeOut);
 
                 AlarmMessage alarMsg;
                 alarMsg.iType = ALARM_EVENT_DISCONNECT_TIMEOUT;

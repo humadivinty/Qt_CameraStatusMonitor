@@ -7,6 +7,7 @@
 #include <QTime>
 #include <QDebug>
 #include <QSettings>
+#include <QTextCodec>
 #define MAX_PATH 260
 
 Camera6467::Camera6467()
@@ -185,6 +186,8 @@ void Camera6467::ReadConfig()
     QString qstrCurrentPath = QDir::currentPath();
     QString qstrFilePath = qstrCurrentPath+"/XLW_Config.ini";
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
+    App_cfg.setIniCodec(QTextCodec::codecForLocale());
+
     m_qstrBackupPath = App_cfg.value("ApplicationInfo/BackupResultSavePath",qstrCurrentPath.append("/BackupResult/") ).toString();
     m_qstrRootPath = App_cfg.value("ApplicationInfo/ResultSavePath",qstrCurrentPath.append("/Result/") ).toString();
     m_iCompressQuality = App_cfg.value("ApplicationInfo/CompressQuality",-1 ).toInt();
@@ -642,6 +645,7 @@ void Camera6467::ReadHistoryInfo()
     QString qstrCurrentPath = QDir::currentPath();
     QString qstrFilePath = qstrCurrentPath+"/XLW_SaveModelInfo.ini";
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
+    App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
     QString qstrBeginTime, qstrEndTime;
     QString qstrParameterGroupName = QString("%1").arg(m_strIP.c_str());
@@ -667,6 +671,7 @@ void Camera6467::WriteHistoryInfo(SaveModeInfo &SaveInfo)
     QString qstrCurrentPath = QDir::currentPath();
     QString qstrFilePath = qstrCurrentPath+"/XLW_SaveModelInfo.ini";
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
+    App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
     QString qstrParameterGroupName = QString("%1").arg(m_strIP.c_str());
     App_cfg.beginGroup(qstrParameterGroupName);

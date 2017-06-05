@@ -25,7 +25,7 @@ public:
     void ExitUpLoad();
 
 signals:
-    void signal_AddCameAddressFinish();
+    //void signal_AddCameAddressFinish();
     void signal_UpLoadCamerStatus();
 
 public slots:

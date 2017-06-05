@@ -3,10 +3,11 @@
 #include<QDebug>
 #include"LogModel/glogmodel.h"
 #include"data_commomdef.h"
+#include<QRegExp>
 
 UnlicensePlateCheck::UnlicensePlateCheck(QObject *parent)
     : BaseEventCheck(parent),
-      m_fRate(0.30)
+      m_iRate(0.30)
 {
     m_bExitCheck = false;
     m_pDataModel = NULL;
@@ -23,7 +24,7 @@ void UnlicensePlateCheck::slot_StartEvent()
     GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck","StartEvent begin.");
 
     bool bRet = false;
-    float fUnlicenseRate = 0.10;
+    int iUnlicenseRate = 0.10;
     CustomTableModel* pDataModel = NULL;
 
     while(!bRet)
@@ -31,7 +32,7 @@ void UnlicensePlateCheck::slot_StartEvent()
         m_mutex.lock();
         bRet = m_bExitCheck;
         pDataModel = m_pDataModel;
-        fUnlicenseRate = m_fRate;
+        iUnlicenseRate = m_iRate;
         m_mutex.unlock();
 
         if(pDataModel)
@@ -42,13 +43,20 @@ void UnlicensePlateCheck::slot_StartEvent()
             for(int i = 0; i < iRowCount; i ++)
             {
                 //QString qstrText = pDataModel->FindColTextFromRow(i, 3);
+                int iRate = 0;
                 QString qstrText = pDataModel->FindColTextFromRow(i, RATE_COLUMN_NUMBER);
-                float fRate = qstrText.toFloat();
-                if(fRate > fUnlicenseRate)
+                QRegExp rx("(\\d+)");  // Æ¥ÅäÊý×Ö
+                int pos = 0;
+                if ((pos = rx.indexIn(qstrText, pos)) != -1) {
+                    iRate = rx.cap(0).toInt();
+                    pos += rx.matchedLength();
+                }
+
+                if(iRate > iUnlicenseRate)
                 {
                     //QString qstrIp = pDataModel->FindColTextFromRow(i, 1);
                     QString qstrIp = pDataModel->FindColTextFromRow(i, IPADDRESS_COLUMN_NUMBER);
-                    QString qstrLog = QString("%1 `s Rate is %2  over range of the Unlicense rate %2").arg(qstrIp).arg(QString::number(fRate, 'f', 2)).arg(QString::number(fUnlicenseRate, 'f', 2));
+                    QString qstrLog = tr("%1 `s Rate is %2%  over range of the Unlicense rate %3%").arg(qstrIp).arg(iRate).arg(iUnlicenseRate);
                     AlarmMessage alarMsg;
                     alarMsg.iType = ALARM_EVENT_UNLICENSE;
                     alarMsg.qstrContent = qstrLog;
@@ -84,11 +92,10 @@ void UnlicensePlateCheck::SetUnlicenseRate(int Rate)
 
     if(Rate > 0)
     {
-        int iRate = Rate%100;
-        m_fRate = (float)iRate/(float)100;
+        m_iRate = Rate;
     }
 
-    qstrLog = QString("SetUnlicenseRate ,final Rate = %1").arg(QString::number(m_fRate, 'f', 2));
+    qstrLog = QString("SetUnlicenseRate ,final Rate = %1%").arg(m_iRate);
     GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck",qstrLog);
 }
 

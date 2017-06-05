@@ -22,7 +22,7 @@ public slots:
 
 private:
     bool m_bExitCheck;
-    float m_fRate;
+    int m_iRate;
     QMutex m_mutex;
 
     CustomTableModel* m_pDataModel;

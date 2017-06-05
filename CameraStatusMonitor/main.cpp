@@ -2,15 +2,16 @@
 #include <QApplication>
 #include <QMetaType>
 #include<QTextCodec>
+#include<QTranslator>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QTextCodec *codec = QTextCodec::codecForName("GBK"); //GBK gbk
-    QTextCodec::setCodecForLocale(codec);
-
+    QTranslator translator;
+    translator.load(QString("CamStatus_zh-cn"));
+    a.installTranslator(&translator);
 
     MainWindow w;
     w.show();

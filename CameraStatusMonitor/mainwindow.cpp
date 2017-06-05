@@ -6,6 +6,8 @@
 #include<QPicture>
 #include <QDir>
 #include <QSettings>
+#include <QTextCodec>
+#include<QInputDialog>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,7 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowTitle(tr("CamerStatuseMonitor"));
+
     ui->pushButton->setVisible(false);
+    ui->StatusTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->StatusTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->StatusTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     QPixmap pixmap("./greenLight.png");
     ui->label->setPixmap(pixmap);
@@ -54,14 +61,36 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-//    AlarmMessage MyMessage;
-//    MyMessage.iType =1;
-//    MyMessage.qstrContent = QString("success!");
-//    emit signal_SendAlarm(MyMessage);
-    QModelIndex index = this->ui->StatusTableView->currentIndex();
-    QStringList tempList = index.data().toStringList();
-    qDebug()<<tempList;
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Input your Device Ip address."),
+                                         tr("IP Address:"), QLineEdit::Normal,
+                                         "192.168.0.1", &ok);
+    if (ok && !text.isEmpty())
+    {
+        qDebug()<<text;
+        if(m_pCamController)
+        {
+            GLogModel::GetInstant()->WriteLog("MainWindow","Init ConnectModel.");
+            int iIndex = -1;
+            for(int i= 0; i< m_CamInfoList.count(); i++)
+            {
+                if(text == QString(m_CamInfoList[i].chIP))
+                {
+                    iIndex = i;
+                    break;
+                }
+            }
+            if(iIndex == -1)
+            {
+                //如果在原队列中没有这个设备IP，就添加进去
+                CameraInfo tempInfo;
+                strcpy(tempInfo.chIP, text.toStdString().c_str());
+                m_CamInfoList.append(tempInfo);
 
+                m_pCamController->addCameraByIPaddress(tempInfo.chIP, tempInfo.chStationID);
+            }
+        }
+    }
 }
 
 void MainWindow::slot_Receive_AlarmMsessage(AlarmMessage Msg)
@@ -105,6 +134,7 @@ void MainWindow::ReadConfig()
     QString qstrCurrentPath = QDir::currentPath();
     QString qstrFilePath = qstrCurrentPath+"/XLW_Config.ini";
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
+    App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
     m_iUnLicenseRate = App_cfg.value("ApplicationInfo/UnLicenseRate", 30).toInt();
     App_cfg.setValue("ApplicationInfo/UnLicenseRate", m_iUnLicenseRate);
@@ -185,7 +215,6 @@ void MainWindow::InitConnectModel()
 
         m_pCamController = new CamConnectContrl();
         m_pCamController->SetDataModel(m_pTableModel);
-        //m_pCamController->addCameraByIPaddress("172.18.80.166");
         for(int i= 0; i< m_CamInfoList.count(); i++)
         {
             m_pCamController->addCameraByIPaddress(m_CamInfoList[i].chIP, m_CamInfoList[i].chStationID);
@@ -246,6 +275,6 @@ void MainWindow::on_pushButton_2_clicked()
 {
     AlarmMessage MyMessage;
     MyMessage.iType =ALARM_EVENT_NORMAL;
-    MyMessage.qstrContent = QString::fromLocal8Bit("解除当前警报");
+    MyMessage.qstrContent = tr("Dismiss current alert");
     emit signal_SendAlarm(MyMessage);
 }
