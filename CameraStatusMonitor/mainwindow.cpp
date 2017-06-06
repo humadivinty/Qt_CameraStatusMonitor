@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->StatusTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->StatusTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    emit  ui->tabWidget->setCurrentIndex(0);
+
     QPixmap pixmap("./greenLight.png");
     ui->label->setPixmap(pixmap);
     ui->label->show();
@@ -204,6 +206,11 @@ void MainWindow::InitAlarmModel()
 
         connect(this, signal_SendAlarm, m_pAlarmModel, &(m_pAlarmModel->slot_Receive_AlarmMsessage));
         connect(m_pAlarmModel, &(m_pAlarmModel->signal_Send_AlarmMessage), this,slot_Receive_AlarmMsessage);
+//        if(m_pTableModel)
+//        {
+//            connect(this, signal_SendAlarm, m_pTableModel, &(m_pTableModel->slot_Receive_AlarmMsessage));
+//            connect(m_pAlarmModel, &(m_pAlarmModel->signal_Send_AlarmMessage), m_pTableModel,&(m_pTableModel->slot_Receive_AlarmMsessage));
+//        }
     }
 }
 
@@ -256,6 +263,12 @@ void MainWindow::UnInitAlarmModel()
        disconnect(this, signal_SendAlarm, m_pAlarmModel, &(m_pAlarmModel->slot_Receive_AlarmMsessage));
        disconnect(m_pAlarmModel, &(m_pAlarmModel->signal_Send_AlarmMessage), this,slot_Receive_AlarmMsessage);
 
+//       if(m_pTableModel)
+//       {
+//           disconnect(this, signal_SendAlarm, m_pTableModel, &(m_pTableModel->slot_Receive_AlarmMsessage));
+//           disconnect(m_pAlarmModel, &(m_pAlarmModel->signal_Send_AlarmMessage), m_pTableModel,&(m_pTableModel->slot_Receive_AlarmMsessage));
+//       }
+
         delete m_pAlarmModel;
         m_pAlarmModel = NULL;
     }
@@ -271,10 +284,42 @@ void MainWindow::UnInitConnectModel()
     }
 }
 
+//读取日志文件并显示到界面中
+void MainWindow::ShowLogToTab2(QString IPAddress)
+{
+    ui->tabWidget->setTabText(1, IPAddress);
+    emit  ui->tabWidget->setCurrentIndex(1);
+
+    QString qstrCurrentPath = QDir::currentPath();
+    qstrCurrentPath.append("//SNW_log//AlarmLog//");
+    qstrCurrentPath.append(IPAddress);
+
+    QFile file(QString("%1.log").arg(qstrCurrentPath));
+     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+         return;
+
+     ui->listWidget_2->clear();
+     QTextStream in(&file);
+     QString line = in.readLine();
+     while (!line.isNull()) {
+         ui->listWidget_2->insertItem(0, line);
+         line = in.readLine();
+     }
+}
+
 void MainWindow::on_pushButton_2_clicked()
 {
     AlarmMessage MyMessage;
     MyMessage.iType =ALARM_EVENT_NORMAL;
+    MyMessage.qstrDeviceIP=tr("MainWindow");
     MyMessage.qstrContent = tr("Dismiss current alert");
     emit signal_SendAlarm(MyMessage);
+}
+
+void MainWindow::on_StatusTableView_clicked(const QModelIndex &index)
+{
+    QModelIndex MyIndex = index.sibling(index.row(), 0);
+    qDebug()<<MyIndex.data().toString();
+
+    ShowLogToTab2(MyIndex.data().toString());
 }

@@ -59,6 +59,7 @@ void UnlicensePlateCheck::slot_StartEvent()
                     QString qstrLog = tr("%1 `s Rate is %2%  over range of the Unlicense rate %3%").arg(qstrIp).arg(iRate).arg(iUnlicenseRate);
                     AlarmMessage alarMsg;
                     alarMsg.iType = ALARM_EVENT_UNLICENSE;
+                    alarMsg.qstrDeviceIP = qstrIp;
                     alarMsg.qstrContent = qstrLog;
 
                     GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck", qstrLog);
@@ -66,7 +67,7 @@ void UnlicensePlateCheck::slot_StartEvent()
                 }
             }
         }
-        QThread::currentThread()->sleep(1);
+        QThread::currentThread()->sleep(60);
     }
 
     GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck","StartEvent end.");

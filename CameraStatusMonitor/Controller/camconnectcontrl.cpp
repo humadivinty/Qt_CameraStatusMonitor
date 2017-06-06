@@ -54,13 +54,15 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraNam
         Camera6467* pNewCamera = new Camera6467(ipaddress.toStdString().c_str());
         if(pNewCamera)
         {
+            CameraInfo tempInfo;
+            sprintf(tempInfo.chIP,"%s", ipaddress.toStdString().c_str());
+            sprintf(tempInfo.chStationID,"%s", CameraName.toStdString().c_str());
+
             if(!CameraName.isEmpty())
             {
-                CameraInfo tempInfo;
-                sprintf(tempInfo.chIP,"%s", ipaddress.toStdString().c_str());
-                sprintf(tempInfo.chStationID,"%s", CameraName.toStdString().c_str());
-                pNewCamera->SetCameraInfo(tempInfo);
+                pNewCamera->SetCameraInfo(tempInfo);                
             }
+            PushDataToModel(tempInfo);      //加入设备时，先放一条信息到界面
 
             m_pCamList.push_back(pNewCamera);
             pNewCamera = NULL;
@@ -129,7 +131,7 @@ void CamConnectContrl::ExitUpLoad()
     m_mutex.lock();
     m_bUpLoadExit = true;
     m_mutex.unlock();
-    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("ExitUpLoad.").arg(quintptr(QThread::currentThreadId())));
+    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("ExitUpLoad %1.").arg(quintptr(QThread::currentThreadId())));
 }
 
 void CamConnectContrl::slot_ConnectCamer()
@@ -167,7 +169,7 @@ void CamConnectContrl::PushDataToModel(CameraInfo &info)
          //QString qstrStationID = QString(info.chStationID);
          QString qstrIP = QString(info.chIP);
          QString qstrConnectInfo = (info.iConnectStatus == 0 ? tr("Connect") : tr("DisConnect"));
-         QString qstrfUnlicensedPlateRatio = QString("%1%").arg(info.fUnlicensedPlateRatio *100);
+         QString qstrfUnlicensedPlateRatio = QString("%1%").arg(QString::number(info.fUnlicensedPlateRatio *100, 'f', 2));
 
          QStringList CamInfoList;
          //CamInfoList.append(qstrStationID);

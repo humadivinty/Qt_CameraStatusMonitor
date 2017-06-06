@@ -1,6 +1,7 @@
 #ifndef CAMSTATUSMODEL
 #define CAMSTATUSMODEL
 #include<QStandardItemModel>
+#include"AlarmModule/AlarmModule.h"
 
 class CustomTableModel : public QStandardItemModel
 {
@@ -23,6 +24,9 @@ public:
     int GetRowCount();
     int GetColCount();
     QString FindColTextFromRow(int iRow, int iColumn);
+
+//public slots:
+//    void slot_Receive_AlarmMsessage(AlarmMessage);
 };
 
 #endif // CAMSTATUSMODEL

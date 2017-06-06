@@ -1,5 +1,6 @@
 #include"DataModel/CustomTableModel.h"
 #include<QDebug>
+#include"data_commomdef.h"
 
 CustomTableModel::CustomTableModel(QObject *parent)
     :QStandardItemModel(parent)
@@ -27,6 +28,9 @@ QVariant CustomTableModel::headerData(int section, Qt::Orientation orientation, 
                 break;
             case 2:
                 return tr("Rates of Unlicense");
+                break;
+            case 3:
+                return tr("Status");
                 break;
             default:
                 break;
@@ -187,3 +191,33 @@ QString CustomTableModel::FindColTextFromRow(int iRow, int iColumn)
     //qstrValue = this->item(iRow, iColumn)->text();    //这样使用会崩溃
     return qstrValue;
 }
+
+//void CustomTableModel::slot_Receive_AlarmMsessage(AlarmMessage alarmMsg)
+//{
+//    int iAlarmType = alarmMsg.iType;
+//    QString qstrIp = alarmMsg.qstrDeviceIP;
+//    QString qstrStatus;
+//    if(iAlarmType == ALARM_EVENT_NORMAL)
+//    {
+//        qstrStatus = tr("Normal");
+//    }
+//    else
+//    {
+//        qstrStatus = tr("Exception");
+//    }
+//    if(qstrIp == tr("MainWindow"))
+//    {
+//        for(int i = 0; i < rowCount() ; i++)
+//        {
+//            UpdataTextFromQString(i , STATUS_NUMBER, qstrStatus);
+//        }
+//    }
+//    else
+//    {
+//        int iRowNumber = FindRowFromQString(IPADDRESS_COLUMN_NUMBER, qstrIp);
+//        if(iRowNumber != -1)
+//        {
+//            UpdataTextFromQString(iRowNumber , STATUS_NUMBER, qstrStatus);
+//        }
+//    }
+//}

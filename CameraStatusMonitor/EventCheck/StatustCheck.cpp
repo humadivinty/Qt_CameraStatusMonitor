@@ -276,6 +276,7 @@ void StatustCheck::CheckChangeTimes(CamStatusInfo * Info,QString StatusText, int
 
         AlarmMessage alarMsg;
         alarMsg.iType = ALARM_EVENT_DISCONNECT_TIMEOUT;
+        alarMsg.qstrDeviceIP = tempInfo->qstrCamIP;
         alarMsg.qstrContent = qstrLog;
 
         //报警信号发送后，要重置
@@ -334,6 +335,7 @@ void StatustCheck::CheckDisConnectTimeOut(CamStatusInfo *Info, QString StatusTex
 
                 AlarmMessage alarMsg;
                 alarMsg.iType = ALARM_EVENT_DISCONNECT_TIMEOUT;
+                alarMsg.qstrDeviceIP = tempInfo->qstrCamIP;
                 alarMsg.qstrContent = qstrLog;
 
                 GLogModel::GetInstant()->WriteLog("StatustCheck", qstrLog);
