@@ -66,7 +66,7 @@ Camera6467::~Camera6467()
         delete m_CameraResult;
         m_CameraResult = NULL;
     }
-
+    WriteLog("exit Camera!");
 }
 
 bool Camera6467::SetCameraInfo(CameraInfo &camInfo)

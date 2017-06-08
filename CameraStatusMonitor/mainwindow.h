@@ -48,6 +48,8 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_delCam_clicked();
+
 public slots:
     void slot_Receive_AlarmMsessage(AlarmMessage);
 
@@ -64,6 +66,14 @@ private:
     void ShowLogToTab2(QString IPAddress);
 
     void deleteDir(const QString &d);
+
+    void GetCameraList();
+    void AddCamer();
+    void AddIPAddressToFile(CameraInfo& info);
+    void AddCameraToList(CameraInfo& info);
+
+    void RemoveCameraFromFile(const QString IPAddress);
+    void RemoveCameraFromList(const QString IPAddress);
 };
 
 #endif // MAINWINDOW_H

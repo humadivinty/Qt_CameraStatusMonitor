@@ -29,6 +29,8 @@ void UnlicensePlateCheck::slot_StartEvent()
 
     while(!bRet)
     {
+        QThread::currentThread()->sleep(1);
+
         m_mutex.lock();
         bRet = m_bExitCheck;
         pDataModel = m_pDataModel;
@@ -62,12 +64,17 @@ void UnlicensePlateCheck::slot_StartEvent()
                     alarMsg.qstrDeviceIP = qstrIp;
                     alarMsg.qstrContent = qstrLog;
 
-                    GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck", qstrLog);
-                    emit signal_SendAlarm(alarMsg);
+                    static int iCount =0;
+                    if(iCount++ > 30)
+                    {
+                        //每半分钟发送一次
+                        iCount = 0;
+                        GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck", qstrLog);
+                        emit signal_SendAlarm(alarMsg);
+                    }
                 }
             }
         }
-        QThread::currentThread()->sleep(60);
     }
 
     GLogModel::GetInstant()->WriteLog("UnlicensePlateCheck","StartEvent end.");

@@ -26,7 +26,7 @@ CamConnectContrl::~CamConnectContrl()
     uploadWorkerThread.quit();
     uploadWorkerThread.wait();
 
-     GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] ~CamConnectContrl .").arg(quintptr(QThread::currentThreadId())));
+    GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] ~CamConnectContrl .").arg(quintptr(QThread::currentThreadId())));
 }
 
 bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraName)
@@ -36,12 +36,14 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraNam
         GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] addCameraByIPaddress failed, the ip address is null.").arg(quintptr(QThread::currentThreadId())));
         return false;
     }
+    QMutexLocker locker(&m_mutex);
 
     int index = -1;
     for(int i = 0 ; i < m_pCamList.count(); i++)
     {
-       Camera6467* pCamer = NULL;
+        Camera6467* pCamer = NULL;
         pCamer = m_pCamList[i];
+
         if(pCamer && ipaddress == QString(pCamer->GetCameraIP().c_str()))
         {
             index = i;
@@ -60,7 +62,7 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraNam
 
             if(!CameraName.isEmpty())
             {
-                pNewCamera->SetCameraInfo(tempInfo);                
+                pNewCamera->SetCameraInfo(tempInfo);
             }
             PushDataToModel(tempInfo);      //加入设备时，先放一条信息到界面
 
@@ -81,6 +83,46 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraNam
     {
         GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] addCameraByIPaddress failed, the camera is already exist, the ip =%1").arg(quintptr(QThread::currentThreadId())).arg(ipaddress));
         return false;
+    }
+}
+
+void CamConnectContrl::RemoveCamerFromIPaddress(QString ipaddress)
+{
+    if(ipaddress.isEmpty())
+    {
+        GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] addCameraByIPaddress failed, the ip address is null.").arg(quintptr(QThread::currentThreadId())));
+        return ;
+    }
+    QMutexLocker locker(&m_mutex);
+
+    int index = -1;
+    for(int i = 0 ; i < m_pCamList.count(); i++)
+    {
+        Camera6467* pCamer = NULL;
+        pCamer = m_pCamList[i];
+
+        if(pCamer && ipaddress == QString(pCamer->GetCameraIP().c_str()))
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if(index >=0)
+    {
+        Camera6467* pCamer = NULL;
+        pCamer = m_pCamList[index];
+        m_pCamList.removeAt(index);
+        if(pCamer)
+        {
+            delete pCamer;
+            pCamer = NULL;
+        }
+
+        if(m_pDataModel)
+        {
+            m_pDataModel->removeRowFromQString(IPADDRESS_COLUMN_NUMBER, ipaddress);
+        }
     }
 }
 
@@ -113,13 +155,16 @@ void CamConnectContrl::slot_UpLoadCamerStatus()
 
         for(int i = 0 ; i < m_pCamList.count(); i++)
         {
-           Camera6467* pCamer = NULL;
+            Camera6467* pCamer = NULL;
+            m_mutex.lock();
             pCamer = m_pCamList[i];
+
             if(pCamer)
             {
                 CameraInfo tempCamInfo = pCamer->GetCameraInfo();
                 PushDataToModel(tempCamInfo);
             }
+            m_mutex.unlock();
         }
         QThread::currentThread()->sleep(1);
     }
@@ -137,12 +182,13 @@ void CamConnectContrl::ExitUpLoad()
 void CamConnectContrl::slot_ConnectCamer()
 {
     QMutexLocker locker(&m_mutex);
-//    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("Thread id [%1] ConnectCamer.").arg(quintptr(QThread::currentThreadId())));
+    //    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("Thread id [%1] ConnectCamer.").arg(quintptr(QThread::currentThreadId())));
 
     for(int i = 0 ; i < m_pCamList.count(); i++)
     {
-       Camera6467* pCamer = NULL;
+        Camera6467* pCamer = NULL;
         pCamer = m_pCamList[i];
+
         if(pCamer && pCamer->IsFirstConnect())
         {
             bool bRet = pCamer->ConnectToCamera();
@@ -158,35 +204,35 @@ void CamConnectContrl::slot_ConnectCamer()
             }
         }
     }
-//    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("Thread id [%1] ConnectCamer finished.").arg(quintptr(QThread::currentThreadId())));
+    //    GLogModel::GetInstant()->WriteLog("CamConnectContrl",QString("Thread id [%1] ConnectCamer finished.").arg(quintptr(QThread::currentThreadId())));
 }
 
 void CamConnectContrl::PushDataToModel(CameraInfo &info)
 {
-     if(m_pDataModel)
-     {
-         //目前定义列表为  IP - ConnectInfo - UnlicensedPlateRatio
-         //QString qstrStationID = QString(info.chStationID);
-         QString qstrIP = QString(info.chIP);
-         QString qstrConnectInfo = (info.iConnectStatus == 0 ? tr("Connect") : tr("DisConnect"));
-         QString qstrfUnlicensedPlateRatio = QString("%1%").arg(QString::number(info.fUnlicensedPlateRatio *100, 'f', 2));
+    if(m_pDataModel)
+    {
+        //目前定义列表为  IP - ConnectInfo - UnlicensedPlateRatio
+        //QString qstrStationID = QString(info.chStationID);
+        QString qstrIP = QString(info.chIP);
+        QString qstrConnectInfo = (info.iConnectStatus == 0 ? tr("Connect") : tr("DisConnect"));
+        QString qstrfUnlicensedPlateRatio = QString("%1%").arg(QString::number(info.fUnlicensedPlateRatio *100, 'f', 2));
 
-         QStringList CamInfoList;
-         //CamInfoList.append(qstrStationID);
-         CamInfoList.append(qstrIP);
-         CamInfoList.append(qstrConnectInfo);
-         CamInfoList.append(qstrfUnlicensedPlateRatio);
+        QStringList CamInfoList;
+        //CamInfoList.append(qstrStationID);
+        CamInfoList.append(qstrIP);
+        CamInfoList.append(qstrConnectInfo);
+        CamInfoList.append(qstrfUnlicensedPlateRatio);
 
-         //int index = m_pDataModel->FindRowFromQString(1, qstrIP);
-         int index = m_pDataModel->FindRowFromQString(IPADDRESS_COLUMN_NUMBER, qstrIP);
-         if(index > -1)
-         {
-             m_pDataModel->UpdataRowFromQStringList(index, CamInfoList);
-         }
-         else
-         {
-             m_pDataModel->InsertRowFromQStringList(CamInfoList);
-         }
-     }
+        //int index = m_pDataModel->FindRowFromQString(1, qstrIP);
+        int index = m_pDataModel->FindRowFromQString(IPADDRESS_COLUMN_NUMBER, qstrIP);
+        if(index > -1)
+        {
+            m_pDataModel->UpdataRowFromQStringList(index, CamInfoList);
+        }
+        else
+        {
+            m_pDataModel->InsertRowFromQStringList(CamInfoList);
+        }
+    }
 }
 

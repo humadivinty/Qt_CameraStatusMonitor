@@ -38,6 +38,7 @@ void StatustCheck::slot_StartEvent()
 
     while(!bRet)
     {
+        QThread::currentThread()->sleep(10);
         m_mutex.lock();
         bRet = m_bExitCheck;
         pDataModel = m_pDataModel;
@@ -82,7 +83,6 @@ void StatustCheck::slot_StartEvent()
                 }
             }
         }
-        QThread::currentThread()->sleep(10);
     }
 
     GLogModel::GetInstant()->WriteLog("StatustCheck","StartEvent finish.");
