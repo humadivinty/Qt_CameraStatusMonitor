@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(tr("CamerStatuseMonitor"));
 
     ui->pushButton->setVisible(false);
+    ui->pushButton_3->setVisible(false);
     ui->StatusTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->StatusTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->StatusTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -290,6 +291,8 @@ void MainWindow::ShowLogToTab2(QString IPAddress)
     ui->tabWidget->setTabText(1, IPAddress);
     emit  ui->tabWidget->setCurrentIndex(1);
 
+    ui->listWidget_2->clear();
+
     QString qstrCurrentPath = QDir::currentPath();
     qstrCurrentPath.append("//SNW_log//AlarmLog//");
     qstrCurrentPath.append(IPAddress);
@@ -298,13 +301,26 @@ void MainWindow::ShowLogToTab2(QString IPAddress)
      if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
          return;
 
-     ui->listWidget_2->clear();
      QTextStream in(&file);
      QString line = in.readLine();
      while (!line.isNull()) {
          ui->listWidget_2->insertItem(0, line);
          line = in.readLine();
      }
+}
+
+void MainWindow::deleteDir(const QString &d)
+{
+    QDir dir(d);
+    foreach (QFileInfo inf, dir.entryInfoList(QDir::Dirs|QDir::Files)) {
+        if(inf.isFile())
+            dir.remove(inf.absoluteFilePath());
+        else if(inf.isDir() &&
+                inf.fileName() != "." &&
+                inf.fileName() != "..")
+            deleteDir(inf.absolutePath()+"/"+inf.fileName());
+    }
+    dir.rmdir(dir.absolutePath());
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -322,4 +338,12 @@ void MainWindow::on_StatusTableView_clicked(const QModelIndex &index)
     qDebug()<<MyIndex.data().toString();
 
     ShowLogToTab2(MyIndex.data().toString());
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QString qstrCurrentPath = QDir::currentPath();
+    qstrCurrentPath.append("//SNW_log//");
+
+    deleteDir(qstrCurrentPath);
 }

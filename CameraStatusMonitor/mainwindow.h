@@ -46,6 +46,8 @@ private slots:
 
     void on_StatusTableView_clicked(const QModelIndex &index);
 
+    void on_pushButton_3_clicked();
+
 public slots:
     void slot_Receive_AlarmMsessage(AlarmMessage);
 
@@ -60,6 +62,8 @@ private:
     void UnInitConnectModel();
 
     void ShowLogToTab2(QString IPAddress);
+
+    void deleteDir(const QString &d);
 };
 
 #endif // MAINWINDOW_H
