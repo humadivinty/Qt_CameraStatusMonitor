@@ -112,6 +112,10 @@ void StatustCheck::SetDisConTimeRangeAndCount(int timeRange, int Count)
     {
         m_iMaxChangeCounts = Count;
     }
+    if(timeRange > 0)
+    {
+        m_iCheckTimeRange = timeRange;
+    }
 
     qstrLog = QString("SetDisConCount ,final Count = %1").arg(m_iMaxChangeCounts);
     GLogModel::GetInstant()->WriteLog("StatustCheck",qstrLog);

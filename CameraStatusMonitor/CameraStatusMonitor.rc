@@ -7,8 +7,8 @@
 IDI_ICON1               ICON    DISCARDABLE     "pic.ico"  
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION 1,0,0,4
-    PRODUCTVERSION 1,0,0,4
+    FILEVERSION 1,0,0,5
+    PRODUCTVERSION 1,0,0,5
 	FILEFLAGSMASK  0x3fL
     FILEFLAGS 0x0L
     FILEOS VOS__WINDOWS32
@@ -19,14 +19,14 @@ VS_VERSION_INFO VERSIONINFO
         BEGIN
             BLOCK "000004b0"
             BEGIN
-                VALUE "CompanyName", ""
+                VALUE "CompanyName", "Signalway"
                 VALUE "FileDescription", "CameraStatusMonitor"
-                VALUE "FileVersion", "1.0.0.4\0"
+                VALUE "FileVersion", "1.0.0.5\0"
                 VALUE "LegalCopyright", "(C) 2010-2017"
 				VALUE "InternalName", "CameraStatusMonitor"
                 VALUE "OriginalFilename", "CameraStatusMonitor.exe"
-                VALUE "ProductName", "CameraStatusMonitorr\0"
-                VALUE "ProductVersion", "1.0.0.4\0"
+                VALUE "ProductName", "CameraStatusMonitor\0"
+                VALUE "ProductVersion", "1.0.0.5\0"
             END
         END
 		BLOCK "VarFileInfo"

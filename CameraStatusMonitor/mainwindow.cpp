@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include"LogModel/glogmodel.h"
+#include"data_commomdef.h"
 #include<QDebug>
 #include<QDateTime>
 #include<QPicture>
@@ -12,45 +13,27 @@
 #include <QDomDocument>
 
 
-
-#define CAMERALIST_FILE_NAME "./CameraList.xml"
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_iUnLicenseCheckEnable(0),
+    m_iConnectingCheckEnable(0),
+    m_iBlackListCheckEnable(1),
+    m_pTableModel(NULL),
+    m_pCamController (NULL),
+    m_pStatusEventCheck ( NULL),
+    m_pUnlicensePlateCheck ( NULL),
+    m_pAlarmModel ( NULL),
+    m_pPlateBlackListCheck(NULL)
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("CamerStatuseMonitor"));
-
-//    ui->pushButton->setVisible(false);
-//    ui->pushButton_3->setVisible(false);
-    ui->StatusTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->StatusTableView->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->StatusTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-    emit  ui->tabWidget->setCurrentIndex(0);
-
-    QPixmap pixmap("./greenLight.png");
-    ui->label->setPixmap(pixmap);
-    ui->label->show();
-
-    m_pTableModel = NULL;
-    m_pCamController = NULL;
-    m_pStatusEventCheck = NULL;
-    m_pUnlicensePlateCheck = NULL;
-    m_pAlarmModel = NULL;
-
-    m_pTableModel = new CustomTableModel();
-    ui->StatusTableView->setModel(m_pTableModel);
-
+    InitUISeting();
     ReadConfig();
     InitAlarmModel();
 
     InitConnectModel();
     InitEventCheckModel();
-
 }
 
 MainWindow::~MainWindow()
@@ -60,6 +43,7 @@ MainWindow::~MainWindow()
     UnInitEventCheckModel();
     UnInitAlarmModel();
     UnInitConnectModel();
+    ClearResultList();
 
     if(m_pTableModel)
     {
@@ -106,46 +90,53 @@ void MainWindow::slot_Receive_AlarmMsessage(AlarmMessage Msg)
     switch (Msg.iType)
     {
     case ALARM_EVENT_NORMAL:
-        pixmap.load("./GreenLight.png");
-        ui->label->setPixmap(pixmap);
+        pixmap.load(GREEN_LIGHT_IMAGE);
+        ui->label->setPixmap(pixmap);        
         break;
-
     case ALARM_EVENT_DISCONNECT_TIMEOUT:
-        pixmap.load("./RetLight.png");
-        ui->label->setPixmap(pixmap);
-        break;
-
     case ALARM_EVENT_UNLICENSE:
-        pixmap.load("./RetLight.png");
+    case ALARM_EVENT_BALCKLIST:
+    case ALARM_EVENT_WHITELIST:
+        pixmap.load(RED_LIGHT_IMAGE);
         ui->label->setPixmap(pixmap);
         break;
 
     default:
         break;
     }
+    emit signal_SendVoiceSignal(Msg.iType);
 }
 
 void MainWindow::ReadConfig()
 {
     QString qstrCurrentPath = QDir::currentPath();
-    QString qstrFilePath = qstrCurrentPath+"/XLW_Config.ini";
+    QString qstrFilePath = qstrCurrentPath+CONFIG_FILE_NAME;
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
     App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
-    m_iUnLicenseRate = App_cfg.value("ApplicationInfo/UnLicenseRate", 30).toInt();
-    App_cfg.setValue("ApplicationInfo/UnLicenseRate", m_iUnLicenseRate);
+    m_iUnLicenseCheckEnable = App_cfg.value("UnLicenseCheck/Enbale", 1).toInt();
+    App_cfg.setValue("UnLicenseCheck/Enbale", m_iUnLicenseCheckEnable);
 
-    m_iDisconnectCount = App_cfg.value("ApplicationInfo/DisconnectCount",5 ).toInt();
-    App_cfg.setValue("ApplicationInfo/DisconnectCount",m_iDisconnectCount );
+    m_iUnLicenseRate = App_cfg.value("UnLicenseCheck/UnLicenseRate", 30).toInt();
+    App_cfg.setValue("UnLicenseCheck/UnLicenseRate", m_iUnLicenseRate);
 
-    m_iCheckTimeRange = App_cfg.value("ApplicationInfo/CheckTimeRange",10 ).toInt();
-    App_cfg.setValue("ApplicationInfo/CheckTimeRange",m_iCheckTimeRange );
+    m_iConnectingCheckEnable = App_cfg.value("ConnectionCheck/Enbale", 1).toInt();
+    App_cfg.setValue("ConnectionCheck/Enbale", m_iConnectingCheckEnable);
 
-    m_iDurationTime = App_cfg.value("ApplicationInfo/DurationTime",5 ).toInt();
-    App_cfg.setValue("ApplicationInfo/DurationTime",m_iDurationTime );
+    m_iDisconnectCount = App_cfg.value("ConnectionCheck/DisconnectCount",5 ).toInt();
+    App_cfg.setValue("ConnectionCheck/DisconnectCount",m_iDisconnectCount );
 
-    m_iCameraCount = App_cfg.value("ApplicationInfo/CameraCount",1 ).toInt();
-    App_cfg.setValue("ApplicationInfo/CameraCount", m_iCameraCount);
+    m_iCheckTimeRange = App_cfg.value("ConnectionCheck/CheckTimeRange",10 ).toInt();
+    App_cfg.setValue("ConnectionCheck/CheckTimeRange",m_iCheckTimeRange );
+
+    m_iDurationTime = App_cfg.value("ConnectionCheck/DurationTime",5 ).toInt();
+    App_cfg.setValue("ConnectionCheck/DurationTime",m_iDurationTime );
+
+    m_iBlackListCheckEnable = App_cfg.value("BlackListCheck/Enbale", 1).toInt();
+    App_cfg.setValue("BlackListCheck/Enbale", m_iBlackListCheckEnable);
+
+//    m_iCameraCount = App_cfg.value("ApplicationInfo/CameraCount",1 ).toInt();
+//    App_cfg.setValue("ApplicationInfo/CameraCount", m_iCameraCount);
 
 
     GetCameraList();
@@ -163,9 +154,28 @@ void MainWindow::ReadConfig()
     //    }
 }
 
+void MainWindow::InitUISeting()
+{
+    setWindowTitle(tr("CamerStatuseMonitor"));
+
+    m_pTableModel = new CustomTableModel();
+    ui->StatusTableView->setModel(m_pTableModel);
+    ui->StatusTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->StatusTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->StatusTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    QPixmap pixmap(GREEN_LIGHT_IMAGE);
+    ui->label->setPixmap(pixmap);
+    ui->label->show();
+
+    //    ui->pushButton->setVisible(false);
+    //    ui->pushButton_3->setVisible(false);
+    emit  ui->tabWidget->setCurrentIndex(0);
+}
+
 void MainWindow::InitEventCheckModel()
 {
-    if(!m_pStatusEventCheck)
+    if(!m_pStatusEventCheck && m_iConnectingCheckEnable)
     {
         GLogModel::GetInstant()->WriteLog("MainWindow","Init StatusEventCheck Model.");
         m_pStatusEventCheck = new StatustCheck();
@@ -178,7 +188,7 @@ void MainWindow::InitEventCheckModel()
         m_pStatusEventCheck->StartEvent();
     }
 
-    if(!m_pUnlicensePlateCheck)
+    if(!m_pUnlicensePlateCheck && m_iUnLicenseCheckEnable)
     {
         GLogModel::GetInstant()->WriteLog("MainWindow","Init UnlicensePlateCheck Model.");
         m_pUnlicensePlateCheck = new UnlicensePlateCheck();
@@ -188,6 +198,15 @@ void MainWindow::InitEventCheckModel()
         m_pUnlicensePlateCheck->SetDataModel(m_pTableModel);
         m_pUnlicensePlateCheck->SetUnlicenseRate(m_iUnLicenseRate);
         m_pUnlicensePlateCheck->StartEvent();
+    }
+    if(!m_pPlateBlackListCheck && m_iBlackListCheckEnable)
+    {
+        GLogModel::GetInstant()->WriteLog("MainWindow","Init PlateBlackListCheck Model.");
+        m_pPlateBlackListCheck = new PlateBlackListCheck();
+
+        connect(m_pPlateBlackListCheck, &(m_pPlateBlackListCheck->signal_SendAlarm), m_pAlarmModel, &(m_pAlarmModel->slot_Receive_AlarmMsessage));
+        m_pPlateBlackListCheck->SetPlateList(&m_lsResult);
+        m_pPlateBlackListCheck->StartEvent();
     }
 }
 
@@ -207,6 +226,7 @@ void MainWindow::InitAlarmModel()
         //            connect(m_pAlarmModel, &(m_pAlarmModel->signal_Send_AlarmMessage), m_pTableModel,&(m_pTableModel->slot_Receive_AlarmMsessage));
         //        }
     }
+    connect(this, signal_SendVoiceSignal, &m_speaker, &(m_speaker.PlayTextByIndex));
 }
 
 void MainWindow::InitConnectModel()
@@ -217,6 +237,7 @@ void MainWindow::InitConnectModel()
 
         m_pCamController = new CamConnectContrl();
         m_pCamController->SetDataModel(m_pTableModel);
+        m_pCamController->SetOutPutResultList(&m_lsResult);
         for(int i= 0; i< m_CamInfoList.count(); i++)
         {
             m_pCamController->addCameraByIPaddress(m_CamInfoList[i].chIP, m_CamInfoList[i].chStationID);
@@ -247,6 +268,15 @@ void MainWindow::UnInitEventCheckModel()
         delete m_pUnlicensePlateCheck;
         m_pUnlicensePlateCheck = NULL;
     }
+
+    if(m_pPlateBlackListCheck)
+    {
+        GLogModel::GetInstant()->WriteLog("MainWindow","UnInit PlateBlackListCheck Model.");
+
+        disconnect(m_pPlateBlackListCheck, &(m_pPlateBlackListCheck->signal_SendAlarm), m_pAlarmModel, &(m_pAlarmModel->slot_Receive_AlarmMsessage));
+        delete m_pPlateBlackListCheck;
+        m_pPlateBlackListCheck = NULL;
+    }
 }
 
 void MainWindow::UnInitAlarmModel()
@@ -276,6 +306,20 @@ void MainWindow::UnInitConnectModel()
         GLogModel::GetInstant()->WriteLog("MainWindow","UnInit Connect Model.");
         delete m_pCamController;
         m_pCamController = NULL;
+    }
+}
+
+void MainWindow::ClearResultList()
+{
+    CameraResult* pResult = NULL;
+    while(!m_lsResult.IsEmpty())
+    {
+        m_lsResult.TimePop(pResult, 100);
+        if(pResult)
+        {
+            delete pResult;
+            pResult = NULL;
+        }
     }
 }
 
@@ -389,6 +433,9 @@ void MainWindow::AddIPAddressToFile(CameraInfo &info)
     else
     {
         //如果文件不存在，则先创建 xml文档 ，最后保存成文件
+        QString qstrHeaderdata = "version=\"1.0\" encoding=\"GB2312\" standalone=\"yes\"";
+        domDocument.appendChild( domDocument.createProcessingInstruction("xml", qstrHeaderdata) );
+
         root = domDocument.createElement("CameraList");
         domDocument.appendChild(root);
     }

@@ -8,7 +8,8 @@
 CamConnectContrl::CamConnectContrl(QObject *parent)
     : QObject(parent),
       m_pDataModel(NULL),
-      m_bUpLoadExit(false)
+      m_bUpLoadExit(false),
+      g_pDataList(NULL)
 {
     this->moveToThread(&uploadWorkerThread);
     connect(this, signal_UpLoadCamerStatus, this, slot_UpLoadCamerStatus);
@@ -19,6 +20,7 @@ CamConnectContrl::~CamConnectContrl()
 {
     ExitUpLoad();
     SetDataModel(NULL);
+    SetOutPutResultList(NULL);
 
     disconnect(this, signal_UpLoadCamerStatus, this, slot_UpLoadCamerStatus);
 
@@ -65,6 +67,7 @@ bool CamConnectContrl::addCameraByIPaddress(QString ipaddress, QString CameraNam
                 pNewCamera->SetCameraInfo(tempInfo);
             }
             PushDataToModel(tempInfo);      //加入设备时，先放一条信息到界面
+            pNewCamera->SetOutPutList(g_pDataList);
 
             m_pCamList.push_back(pNewCamera);
             pNewCamera = NULL;
@@ -128,7 +131,14 @@ void CamConnectContrl::RemoveCamerFromIPaddress(QString ipaddress)
 
 void CamConnectContrl::SetDataModel(CustomTableModel *DataModel)
 {
+    QMutexLocker locker(&m_mutex);
     m_pDataModel = DataModel;
+}
+
+void CamConnectContrl::SetOutPutResultList(void *dataList)
+{
+    QMutexLocker locker(&m_mutex);
+    g_pDataList = dataList;
 }
 
 void CamConnectContrl::StarUpLoad()
@@ -144,28 +154,13 @@ void CamConnectContrl::slot_UpLoadCamerStatus()
     while(!bExit)
     {
         //GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] UpLoadCamerStatus run..").arg(quintptr(QThread::currentThreadId())));
-
-        m_mutex.lock();
-        bExit = m_bUpLoadExit;
-        m_mutex.unlock();
+        bExit = GetExitStatus();
         if(bExit)
             break;
 
         slot_ConnectCamer();
+        UpLoadData();
 
-        for(int i = 0 ; i < m_pCamList.count(); i++)
-        {
-            Camera6467* pCamer = NULL;
-            m_mutex.lock();
-            pCamer = m_pCamList[i];
-
-            if(pCamer)
-            {
-                CameraInfo tempCamInfo = pCamer->GetCameraInfo();
-                PushDataToModel(tempCamInfo);
-            }
-            m_mutex.unlock();
-        }
         QThread::currentThread()->sleep(1);
     }
     GLogModel::GetInstant()->WriteLog("CamConnectContrl", QString("Thread id [%1] UpLoadCamerStatus end.").arg(quintptr(QThread::currentThreadId())));
@@ -234,5 +229,31 @@ void CamConnectContrl::PushDataToModel(CameraInfo &info)
             m_pDataModel->InsertRowFromQStringList(CamInfoList);
         }
     }
+}
+
+void CamConnectContrl::UpLoadData()
+{
+    for(int i = 0 ; i < m_pCamList.count(); i++)
+    {
+        Camera6467* pCamer = NULL;
+        m_mutex.lock();
+        pCamer = m_pCamList[i];
+
+        if(pCamer)
+        {
+            CameraInfo tempCamInfo = pCamer->GetCameraInfo();
+            PushDataToModel(tempCamInfo);
+        }
+        m_mutex.unlock();
+    }
+}
+
+bool CamConnectContrl::GetExitStatus()
+{
+    bool bSatus = false;
+    m_mutex.lock();
+    bSatus = m_bUpLoadExit;
+    m_mutex.unlock();
+    return bSatus;
 }
 

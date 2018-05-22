@@ -20,6 +20,7 @@ public:
     void RemoveCamerFromIPaddress(QString ipaddress);
     void RemoveAllCamera();
     void SetDataModel(CustomTableModel* DataModel);
+    void SetOutPutResultList(void* dataList);
 
     void StarUpLoad();
     void ExitUpLoad();
@@ -34,17 +35,20 @@ public slots:
 
 private:
     QThread uploadWorkerThread;
-    QThread ConnectWorkerThread;
 
     QList<Camera6467*> m_pCamList;
     CustomTableModel* m_pDataModel;
 
     bool m_bUpLoadExit;
 
+    void* g_pDataList;
+
     QMutex m_mutex;
 
 private:
     void PushDataToModel(CameraInfo& info);
+    void UpLoadData();
+    bool GetExitStatus();
 };
 
 #endif // CAMCONNECTCONTRL_H

@@ -6,7 +6,11 @@
 #include"Controller/camconnectcontrl.h"
 #include"EventCheck/StatustCheck.h"
 #include"EventCheck/UnlicensePlateCheck.h"
+#include"EventCheck/plateblacklistcheck.h"
 #include"AlarmModule/AlarmModule.h"
+#include"DataModel/custresultlist.h"
+#include"AlarmModule/textspeaker.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +26,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    int m_iUnLicenseCheckEnable;
+    int m_iConnectingCheckEnable;
+    int m_iBlackListCheckEnable;
     int m_iUnLicenseRate;          //无车牌所占比率
     int m_iCheckTimeRange;      //监测断开次数的时间段
     int m_iDisconnectCount;     //断开次数
@@ -30,15 +37,19 @@ private:
 
     int m_iCameraCount;          //相机数
     QList<CameraInfo> m_CamInfoList;
+    ThreadSafeList<CameraResult*> m_lsResult;
 public:
     CustomTableModel* m_pTableModel;
     CamConnectContrl* m_pCamController;
     StatustCheck* m_pStatusEventCheck;
     UnlicensePlateCheck* m_pUnlicensePlateCheck;
     AlarmModule* m_pAlarmModel;
+    PlateBlackListCheck* m_pPlateBlackListCheck;
+    TextSpeaker m_speaker;
 
 signals:
     void signal_SendAlarm(AlarmMessage);
+    void signal_SendVoiceSignal(int);
 private slots:
     void on_pushButton_clicked();
 
@@ -55,6 +66,7 @@ public slots:
 
 private:
     void ReadConfig();
+    void InitUISeting();
     void InitEventCheckModel();
     void InitAlarmModel();
     void InitConnectModel();
@@ -62,6 +74,7 @@ private:
     void UnInitEventCheckModel();
     void UnInitAlarmModel();
     void UnInitConnectModel();
+    void ClearResultList();
 
     void ShowLogToTab2(QString IPAddress);
 

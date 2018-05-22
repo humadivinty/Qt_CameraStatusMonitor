@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "data_commomdef.h"
 #include <QApplication>
 #include <QMetaType>
 #include<QTextCodec>
@@ -10,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QTranslator translator;
-    translator.load(QString("CamStatus_zh-cn"));
+    translator.load(QString(TRANSLATION_DOCUMENT));
     a.installTranslator(&translator);
 
     MainWindow w;

@@ -1,6 +1,8 @@
 #include "Camera/camera6467.h"
 #include "Camera/cameraresult.h"
 #include "HvDeviceAPI/SWErrCode.h"
+#include"DataModel/custresultlist.h"
+#include"data_commomdef.h"
 #include <QDir>
 #include <QTextStream>
 #include <QDate>
@@ -8,6 +10,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QTextCodec>
+#include<QImage>
 #define MAX_PATH 260
 
 Camera6467::Camera6467()
@@ -22,7 +25,8 @@ Camera6467::Camera6467()
       m_iCompressQuality(30),
       m_iDirection(0),
       m_iTotalPlateCount(0),
-      m_iUnlisensePlateCount(0)
+      m_iUnlisensePlateCount(0),
+      g_pOutputList(NULL)
 {
     memset(m_chStationID, 0 , sizeof(m_chStationID));
     memset(m_chDeviceID, 0 , sizeof(m_chDeviceID));
@@ -42,7 +46,8 @@ Camera6467::Camera6467(const char *chIP)
       m_iCompressQuality(30),
       m_iDirection(0),
       m_iTotalPlateCount(0),
-      m_iUnlisensePlateCount(0)
+      m_iUnlisensePlateCount(0),
+      g_pOutputList(NULL)
 {
     if(NULL != chIP)
     {
@@ -56,6 +61,7 @@ Camera6467::Camera6467(const char *chIP)
 
 Camera6467::~Camera6467()
 {
+    SetOutPutList(NULL);
     if(NULL != m_hHvHandle)
     {
         HVAPI_CloseEx((HVAPI_HANDLE_EX)m_hHvHandle);
@@ -184,7 +190,7 @@ std::string Camera6467::GetCameraIP()
 void Camera6467::ReadConfig()
 {
     QString qstrCurrentPath = QDir::currentPath();
-    QString qstrFilePath = qstrCurrentPath+"/XLW_Config.ini";
+    QString qstrFilePath = qstrCurrentPath+CONFIG_FILE_NAME;
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
     App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
@@ -364,31 +370,34 @@ void Camera6467::AnalysisAppendInfo(CameraResult* CamResult)
 
     CamResult->iPlateTypeNo = 255;
 
-    QString qstrAppendInfo, qstrPlateNo;
-    if(m_qstrTextCodeName.contains("UTF"))
-    {
-        qstrAppendInfo = QString::fromLocal8Bit(CamResult->pcAppendInfo);
-        qstrPlateNo = QString::fromLocal8Bit(CamResult->chPlateNO);
-    }
-    else if(m_qstrTextCodeName.contains("GB"))
-    {
-        qstrAppendInfo = QString(CamResult->pcAppendInfo);
-        qstrPlateNo = QString(CamResult->chPlateNO);
-    }
+//    QString qstrAppendInfo, qstrPlateNo;
+//    if(m_qstrTextCodeName.contains("UTF"))
+//    {
+//        qstrAppendInfo = QString::fromLocal8Bit(CamResult->pcAppendInfo);
+//        qstrPlateNo = QString::fromLocal8Bit(CamResult->chPlateNO);
+//    }
+//    else if(m_qstrTextCodeName.contains("GB"))
+//    {
+//        qstrAppendInfo = QString(CamResult->pcAppendInfo);
+//        qstrPlateNo = QString(CamResult->chPlateNO);
+//    }
 
 
-    WriteLog(qstrAppendInfo);
+//    WriteLog(qstrAppendInfo);
 
-    if(!qstrPlateNo.contains("无"))
-    {
-        char chTempPlateNo[32] = {0};
-        char *chPlate = CamResult->chPlateNO;
-        sprintf(chTempPlateNo, "%s", chPlate+3);
-        sprintf(CamResult->chPlateNO, "%s", chTempPlateNo);
-        QString tempInfo = QString("the final plateNO is : %1").arg(CamResult->chPlateNO);
-        qDebug()<<tempInfo;
-        WriteLog(tempInfo);
-    }
+//    if(!qstrPlateNo.contains("无"))
+//    {
+//        char chTempPlateNo[32] = {0};
+//        char *chPlate = CamResult->chPlateNO;
+//        sprintf(chTempPlateNo, "%s", chPlate+2);
+//        sprintf(CamResult->chPlateNO, "%s", chTempPlateNo);
+//        QString tempInfo = QString("the final plateNO is : %1").arg(CamResult->chPlateNO);
+//        qDebug()<<tempInfo;
+//        WriteLog(tempInfo);
+//    }
+    QTextCodec* textCdec = QTextCodec::codecForName("GB18030");
+    QString qstrAppendInfo = textCdec->toUnicode(CamResult->pcAppendInfo);
+    QString qstrPlateNo = textCdec->toUnicode(CamResult->chPlateNO);
 
     if(qstrPlateNo.contains("蓝"))
     {
@@ -640,10 +649,16 @@ CameraInfo &Camera6467::GetCameraInfo()
     return m_CamInfo;
 }
 
+void Camera6467::SetOutPutList(void *outList)
+{
+    QMutexLocker Locker(&m_ResultMutex);
+    g_pOutputList = outList;
+}
+
 void Camera6467::ReadHistoryInfo()
 {
     QString qstrCurrentPath = QDir::currentPath();
-    QString qstrFilePath = qstrCurrentPath+"/XLW_SaveModelInfo.ini";
+    QString qstrFilePath = qstrCurrentPath+CONFIG_SAVEMODELINFO_FILE;
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
     App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
@@ -669,7 +684,7 @@ void Camera6467::ReadHistoryInfo()
 void Camera6467::WriteHistoryInfo(SaveModeInfo &SaveInfo)
 {
     QString qstrCurrentPath = QDir::currentPath();
-    QString qstrFilePath = qstrCurrentPath+"/XLW_SaveModelInfo.ini";
+    QString qstrFilePath = qstrCurrentPath+CONFIG_SAVEMODELINFO_FILE;
     QSettings App_cfg(qstrFilePath,QSettings::IniFormat );
     App_cfg.setIniCodec(QTextCodec::codecForLocale());
 
@@ -749,23 +764,25 @@ bool Camera6467::SaveImgToDisk(QString chImgPath, BYTE *pImgData, DWORD dwImgSiz
     return bRet;
 }
 
-//bool Camera6467::SaveImgToDiskByQt(CameraIMG &camImageStruct)
-//{
-//    QImage qBigImg;
-//    bool bLoad = qBigImg.loadFromData(camImageStruct.pbImgData, camImageStruct.dwImgSize);
-//    //qDebug()<<QString("Image Load")<<bLoad;
-//    QString qstrSavePath = QString::fromLocal8Bit(camImageStruct.chSavePath);
-//    bool bret = false;
-//    if(!qstrSavePath.isEmpty())
-//    {
-//        QString qstrTempPath = qstrSavePath.mid(0, qstrSavePath.lastIndexOf("/"));
-//        QDir tempDir;
-//        tempDir.mkpath(qstrTempPath);
-//        //qDebug()<<qstrTempPath;
-//        bret = qBigImg.save(qstrSavePath,"JPEG", m_iCompressQuality);
-//    }
-//    return bret;
-//}
+bool Camera6467::SaveImgToDiskByQt(CameraIMG &camImageStruct)
+{
+    QImage qBigImg;
+    bool bLoad = qBigImg.loadFromData(camImageStruct.pbImgData, camImageStruct.dwImgSize);
+    //qDebug()<<QString("Image Load")<<bLoad;
+    //QString qstrSavePath = QString::fromLocal8Bit(camImageStruct.chSavePath);
+    QTextCodec* textCdec = QTextCodec::codecForName("GB18030");
+    QString qstrSavePath = textCdec->toUnicode(camImageStruct.chSavePath);
+    bool bret = false;
+    if(!qstrSavePath.isEmpty() && bLoad)
+    {
+        QString qstrTempPath = qstrSavePath.mid(0, qstrSavePath.lastIndexOf("/"));
+        QDir tempDir;
+        tempDir.mkpath(qstrTempPath);
+        //qDebug()<<qstrTempPath;
+        bret = qBigImg.save(qstrSavePath,"JPEG", m_iCompressQuality);
+    }
+    return bret;
+}
 
 void Camera6467::SetImgPath(CameraResult *camResult)
 {
@@ -841,7 +858,20 @@ int Camera6467::RecordInfoEnd(DWORD dwCarID)
 
         if(NULL != m_CameraResult)
         {
-            ///TODO
+            m_ResultMutex.lock();
+            if(g_pOutputList)
+            {
+                m_ResultMutex.unlock();
+                qDebug() << "Put result to list.";
+                WriteLog("Put result to list.");
+                CameraResult* pResult = new CameraResult(*m_CameraResult);
+                ((ThreadSafeList<CameraResult*> *)g_pOutputList)->pushBack(pResult);
+                pResult = NULL;
+            }
+            else
+            {
+                m_ResultMutex.unlock();
+            }
         }
     }
     else
@@ -873,9 +903,12 @@ int Camera6467::RecordInfoPlate(DWORD dwCarID, LPCSTR pcPlateNo, LPCSTR pcAppend
         memset(m_CameraResult->pcAppendInfo, 0, sizeof(m_CameraResult->pcAppendInfo));
         HVAPIUTILS_ParsePlateXmlStringEx(pcAppendInfo, m_CameraResult->pcAppendInfo, 2048);
 
-        QString plateNo = QString::fromLocal8Bit(m_CameraResult->chPlateNO);
+        QTextCodec* textCdec = QTextCodec::codecForName("GB18030");
+        QString plateNo = textCdec->toUnicode(pcPlateNo);
+        QString qstrAppendInfo = textCdec->toUnicode(pcAppendInfo);
         qDebug()<<plateNo;
         WriteLog(plateNo);
+        WriteLog(qstrAppendInfo);
 
         if(m_iTotalPlateCount <= 100)
         {
@@ -939,7 +972,7 @@ int Camera6467::RecordInfoSmallImage(DWORD dwCarID, WORD wWidth, WORD wHeight, P
         m_CameraResult->CIMG_PlateImage.pbImgData = new BYTE[iBuffLen];
         if (m_CameraResult->CIMG_PlateImage.pbImgData != NULL)
         {
-            memset(m_CameraResult->CIMG_PlateImage.pbImgData, 0 ,102400);
+            memset(m_CameraResult->CIMG_PlateImage.pbImgData, 0 ,iBuffLen);
             HRESULT Hr = HVAPIUTILS_SmallImageToBitmapEx(pbPicData,
                                                          wWidth,
                                                          wHeight,

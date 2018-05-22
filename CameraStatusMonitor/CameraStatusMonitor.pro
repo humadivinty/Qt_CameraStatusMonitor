@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui xml
+QT       += core gui xml multimedia texttospeech
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,18 +23,16 @@ SOURCES += main.cpp\
     EventCheck/BaseEventCheck.cpp \
     EventCheck/StatustCheck.cpp \
     EventCheck/UnlicensePlateCheck.cpp \
-    AlarmModule/AlarmModule.cpp
+    AlarmModule/AlarmModule.cpp \
+    DataModel/custresultlist.cpp \
+    UtilityFunction/utilityfunction.cpp \
+    EventCheck/plateblacklistcheck.cpp \
+    AlarmModule/textspeaker.cpp
 
 HEADERS  += mainwindow.h \
-    camstatusmodel.h \
     DataModel/CustomTableModel.h \
     Camera/camera6467.h \
     Camera/cameraresult.h \
-    HvDeviceAPI/HvCameraType.h \
-    HvDeviceAPI/HvDeviceCommon.h \
-    HvDeviceAPI/HvDeviceEx.h \
-    HvDeviceAPI/LinuxBmp.h \
-    HvDeviceAPI/swerror.h \
     HvDeviceAPI/HVAPI_HANDLE_CONTEXT.h \
     HvDeviceAPI/HVAPI_HANDLE_CONTEXT_EX.h \
     HvDeviceAPI/HvAutoLink.h \
@@ -59,7 +57,11 @@ HEADERS  += mainwindow.h \
     EventCheck/StatustCheck.h \
     EventCheck/UnlicensePlateCheck.h \
     AlarmModule/AlarmModule.h \
-    data_commomdef.h
+    data_commomdef.h \
+    DataModel/custresultlist.h \
+    UtilityFunction/utilityfunction.h \
+    EventCheck/plateblacklistcheck.h \
+    AlarmModule/textspeaker.h
 
 FORMS    += mainwindow.ui
 

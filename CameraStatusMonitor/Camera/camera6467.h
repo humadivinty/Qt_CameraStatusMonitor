@@ -109,6 +109,8 @@ public:
     bool IsFirstConnect();
     CameraInfo& GetCameraInfo();
 
+    void SetOutPutList(void* outList);
+
 
     CameraResult* m_CameraResult;
 
@@ -137,10 +139,14 @@ private:
     SaveModeInfo m_SaveModelInfo;
     CameraInfo m_CamInfo;
     QMutex m_ResultMutex;
+
+    void* g_pOutputList;
+
     void ReadHistoryInfo();
     void WriteHistoryInfo(SaveModeInfo& SaveInfo);
 
     bool SaveImgToDisk( QString chImgPath, BYTE* pImgData, DWORD dwImgSize);
+    bool SaveImgToDiskByQt(CameraIMG &camImageStruct);
 
     void SetImgPath(CameraResult* camResult);
 
