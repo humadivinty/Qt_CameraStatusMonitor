@@ -9,7 +9,7 @@
 #include"EventCheck/plateblacklistcheck.h"
 #include"AlarmModule/AlarmModule.h"
 #include"DataModel/custresultlist.h"
-#include"AlarmModule/textspeaker.h"
+#include"AlarmModule/ttsformicrosoft.h"
 
 
 namespace Ui {
@@ -45,7 +45,8 @@ public:
     UnlicensePlateCheck* m_pUnlicensePlateCheck;
     AlarmModule* m_pAlarmModel;
     PlateBlackListCheck* m_pPlateBlackListCheck;
-    TextSpeaker m_speaker;
+    //TextSpeaker m_speaker;
+    TTSforMicrosoft m_speaker;
 
 signals:
     void signal_SendAlarm(AlarmMessage);

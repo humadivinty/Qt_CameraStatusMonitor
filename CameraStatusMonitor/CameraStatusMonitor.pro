@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui xml multimedia texttospeech
+QT       += core gui xml multimedia axcontainer
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,7 +27,7 @@ SOURCES += main.cpp\
     DataModel/custresultlist.cpp \
     UtilityFunction/utilityfunction.cpp \
     EventCheck/plateblacklistcheck.cpp \
-    AlarmModule/textspeaker.cpp
+    AlarmModule/ttsformicrosoft.cpp
 
 HEADERS  += mainwindow.h \
     DataModel/CustomTableModel.h \
@@ -61,7 +61,7 @@ HEADERS  += mainwindow.h \
     DataModel/custresultlist.h \
     UtilityFunction/utilityfunction.h \
     EventCheck/plateblacklistcheck.h \
-    AlarmModule/textspeaker.h
+    AlarmModule/ttsformicrosoft.h
 
 FORMS    += mainwindow.ui
 
