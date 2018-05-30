@@ -73,7 +73,7 @@
     <message>
         <location filename="mainwindow.ui" line="177"/>
         <source>TextLabel</source>
-        <translation> </translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="206"/>
@@ -149,12 +149,12 @@
     <message>
         <location filename="EventCheck/plateblacklistcheck.cpp" line="58"/>
         <source>%1 Find from the black list, send alarm signal.</source>
-        <translation>%1 在黑名单中，发送警报信号。</translation>
+        <translation>%1 在黑名单列表中，发送警报信号。</translation>
     </message>
     <message>
         <location filename="EventCheck/plateblacklistcheck.cpp" line="71"/>
         <source>%1 Find from the white list, send alarm signal.</source>
-        <translation>%1 在黑名单列表中，发送警报信号。</translation>
+        <translation>%1 在白名单列表中，发送警报信号。</translation>
     </message>
     <message>
         <location filename="EventCheck/plateblacklistcheck.cpp" line="84"/>
@@ -182,48 +182,79 @@
     </message>
 </context>
 <context>
+    <name>TTSforMicrosoft</name>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="48"/>
+        <source>Get Media List ,Cannot read file %1:
+%2.</source>
+        <translation>获取名单列表，无法读取文件%1:\n%2。</translation>
+    </message>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="62"/>
+        <source>Get Media List  ,Parse error at line %1, column %2:
+%3</source>
+        <translation>读取名单，在%1行,%2列处解析失败: %3</translation>
+    </message>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="95"/>
+        <source>Add Alarm Info ToFile ,Cannot ReadOnly file %1:
+%2.</source>
+        <translation>增加警报信息到配置文件，无法读取文件%1:%2。</translation>
+    </message>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="141"/>
+        <source>AddIPAddressToFile ,Cannot WriteOnly file %1:
+%2.</source>
+        <translation>增加IP到列表中，无法写入文件%1:%2.</translation>
+    </message>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="184"/>
+        <source>Attention please, attention please,this car is in the black list.</source>
+        <translation>请注意，请注意，该车在黑名单中。</translation>
+    </message>
+    <message>
+        <location filename="AlarmModule/ttsformicrosoft.cpp" line="190"/>
+        <source>Attention please, attention please,this car is in the white list.</source>
+        <translation>请注意，请注意，该车在白名单中。</translation>
+    </message>
+</context>
+<context>
     <name>TextSpeaker</name>
     <message>
         <source>BlackList</source>
         <translation type="vanished">黑名单</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="72"/>
         <source>Attention please, attention please,this car is in the black list.</source>
-        <translation>请注意，请注意，该车在黑名单中。</translation>
+        <translation type="vanished">请注意，请注意，该车在黑名单中。</translation>
     </message>
     <message>
         <source>WhiteList</source>
         <translation type="vanished">白名单</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="78"/>
         <source>Attention please, attention please,this car is in the white list.</source>
-        <translation>请注意，请注意，该车在白名单中。</translation>
+        <translation type="vanished">请注意，请注意，该车在白名单中。</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="99"/>
         <source>Get Media List ,Cannot read file %1:
 %2.</source>
-        <translation>获取名单列表，无法读取文件%1:\n%2。</translation>
+        <translation type="vanished">获取名单列表，无法读取文件%1:\n%2。</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="113"/>
         <source>Get Media List  ,Parse error at line %1, column %2:
 %3</source>
-        <translation>读取名单，在%1行,%2列处解析失败: %3</translation>
+        <translation type="vanished">读取名单，在%1行,%2列处解析失败: %3</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="146"/>
         <source>Add Alarm Info ToFile ,Cannot ReadOnly file %1:
 %2.</source>
-        <translation>增加警报信息到配置文件，无法读取文件%1:%2。</translation>
+        <translation type="vanished">增加警报信息到配置文件，无法读取文件%1:%2。</translation>
     </message>
     <message>
-        <location filename="AlarmModule/textspeaker.cpp" line="192"/>
         <source>AddIPAddressToFile ,Cannot WriteOnly file %1:
 %2.</source>
-        <translation>增加设备到配置文件，无法写入配置文件%1:%2。</translation>
+        <translation type="vanished">增加设备到配置文件，无法写入配置文件%1:%2。</translation>
     </message>
 </context>
 <context>

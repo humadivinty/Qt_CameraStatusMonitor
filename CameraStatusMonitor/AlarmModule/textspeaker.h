@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include<QMediaPlayer>
-#include<QTextToSpeech>
 
 class TextSpeaker : public QObject
 {
